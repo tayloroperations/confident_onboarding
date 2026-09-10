@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confident Onboarding Portal — First Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --purple:#1C1739;
+  --blue:#5237E9;
+  --cyan:#5CCEFF;
+  --coral:#F36344;
+  --gray:#F3F3F3;
+  --white:#FFFFFF;
+  --ink:#1A1A2E;
+
+  --purple-soft:rgba(28,23,57,.06);
+  --blue-soft:rgba(82,55,233,.08);
+  --cyan-soft:rgba(92,206,255,.16);
+  --coral-soft:rgba(243,99,68,.10);
+  --line:rgba(28,23,57,.10);
+
+  --r-sm:8px; --r-md:14px; --r-lg:20px; --r-pill:999px;
+  --shadow:0 1px 2px rgba(28,23,57,.04), 0 8px 24px rgba(28,23,57,.06);
+  --font:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);
+  color:var(--ink);
+  background:var(--white);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;font-weight:700;color:var(--purple);letter-spacing:-.015em}
+h1{font-size:30px;line-height:1.2}
+h2{font-size:22px;line-height:1.25}
+h3{font-size:17px;line-height:1.3;font-weight:600}
+p{margin:0}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
+
+.overline{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.10em;text-transform:uppercase;color:rgba(28,23,57,.55);
+}
+.mono{font-family:var(--mono)}
+.muted{color:rgba(28,23,57,.60)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- app shell ---------- */
+.topbar{
+  background:var(--purple);color:var(--white);
+  padding:14px 28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+}
+.topbar .logo{height:26px;width:auto;display:block;flex-shrink:0}
+.topbar .spacer{flex:1}
+.resetbtn{
+  font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.20);
+  border-radius:var(--r-pill);padding:5px 12px;transition:.15s;
+}
+.resetbtn:hover{color:var(--white);border-color:rgba(255,255,255,.45)}
+.switcher{
+  display:flex;background:rgba(255,255,255,.10);border-radius:var(--r-pill);padding:3px;gap:2px;
+}
+.switcher button{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(255,255,255,.72);padding:7px 16px;border-radius:var(--r-pill);transition:.15s;
+}
+.switcher button:hover{color:var(--white)}
+.switcher button[aria-pressed="true"]{background:var(--white);color:var(--purple)}
+.draftflag{
+  font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--cyan);border:1px solid rgba(92,206,255,.45);border-radius:var(--r-pill);padding:4px 11px;
+}
+.page{max-width:1240px;margin:0 auto;padding:40px 28px 96px}
+
+/* ---------- lab hero ---------- */
+.hero{
+  background:var(--purple);color:var(--white);border-radius:var(--r-lg);
+  padding:36px 40px;margin-bottom:32px;position:relative;overflow:hidden;
+}
+.hero:after{
+  content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;
+  border-radius:50%;background:rgba(92,206,255,.10);
+}
+.hero h1{color:var(--white);margin-bottom:6px}
+.hero .sub{color:rgba(255,255,255,.72);font-size:15px}
+.hero-grid{display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap;position:relative;z-index:1}
+.hero-left{flex:1;min-width:300px}
+.progress-wrap{margin-top:26px;max-width:520px}
+.progress-line{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.progress-count{font-family:var(--mono);font-size:13px;color:var(--cyan);letter-spacing:.04em}
+.bar{height:8px;border-radius:var(--r-pill);background:rgba(255,255,255,.16);overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:var(--r-pill);background:var(--cyan);transition:width .3s}
+
+.nextcard{
+  background:var(--white);border-radius:var(--r-md);padding:22px 24px;
+  min-width:310px;max-width:380px;box-shadow:var(--shadow);
+}
+.nextcard .overline{color:var(--coral)}
+.nextcard h3{margin:8px 0 6px}
+.nextcard p{font-size:14px;color:rgba(28,23,57,.68)}
+.btn-coral{
+  display:inline-block;margin-top:16px;background:var(--coral);color:var(--white);
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+  padding:11px 20px;border-radius:var(--r-pill);
+}
+.btn-coral:hover{filter:brightness(.95)}
+
+/* ---------- layout ---------- */
+.cols{display:flex;gap:32px;align-items:flex-start}
+.main{flex:1;min-width:0}
+.rail{width:320px;flex-shrink:0}
+@media(max-width:1000px){.cols{flex-direction:column}.rail{width:100%}}
+
+.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+
+.btn-ghost{
+  border:1px solid var(--line);border-radius:var(--r-pill);padding:9px 16px;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--purple);background:var(--white);transition:.15s;
+}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn-blue{
+  background:var(--blue);color:var(--white);border-radius:var(--r-pill);padding:10px 18px;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;
+}
+.btn-blue:hover{filter:brightness(1.06)}
+
+/* ---------- phases + tasks ---------- */
+.phase{margin-bottom:26px;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--white)}
+.phase-head{
+  display:flex;align-items:center;gap:14px;padding:16px 20px;
+  background:var(--gray);border-bottom:1px solid var(--line);
+}
+.phase-badge{
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--cyan-soft);color:var(--purple);padding:5px 11px;border-radius:var(--r-pill);white-space:nowrap;
+}
+.phase-head h3{flex:1;min-width:0}
+.phase-meter{display:flex;align-items:center;gap:10px}
+.phase-meter .bar{width:82px;background:rgba(28,23,57,.10)}
+.phase-meter .bar>span{background:var(--blue)}
+.phase-meter .n{font-family:var(--mono);font-size:12px;color:rgba(28,23,57,.62)}
+
+.task{border-bottom:1px solid var(--line);transition:background .15s}
+.task:last-child{border-bottom:0}
+.task:hover{background:rgba(82,55,233,.025)}
+.task-row{display:flex;align-items:flex-start;gap:14px;padding:15px 20px}
+.check{
+  width:20px;height:20px;flex-shrink:0;margin-top:2px;border-radius:6px;
+  border:1.5px solid rgba(28,23,57,.28);background:var(--white);
+  display:grid;place-items:center;transition:.15s;
+}
+.check:hover{border-color:var(--blue)}
+.check[data-done="1"]{background:var(--blue);border-color:var(--blue)}
+.check svg{width:12px;height:12px;opacity:0}
+.check[data-done="1"] svg{opacity:1}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:15px;font-weight:500;color:var(--ink);display:block;text-align:left}
+.task[data-done="1"] .task-title{color:rgba(28,23,57,.45);text-decoration:line-through}
+.task-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}
+.chip{
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 9px;border-radius:var(--r-pill);white-space:nowrap;
+}
+.chip-lab{background:var(--cyan-soft);color:#0d5c80}
+.chip-conf{background:var(--blue-soft);color:var(--blue)}
+.chip-late{background:var(--coral-soft);color:#b8391f}
+.chip-src{background:var(--purple-soft);color:rgba(28,23,57,.62)}
+.task-date{font-family:var(--mono);font-size:11px;color:rgba(28,23,57,.50)}
+.task-expand{padding:0 20px 20px 54px;display:none}
+.task[data-open="1"] .task-expand{display:block}
+.task-desc{font-size:14px;color:rgba(28,23,57,.72);margin-bottom:14px;max-width:64ch}
+.attach{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.attach a{display:flex;align-items:center;gap:9px;font-size:13.5px}
+.attach svg{width:14px;height:14px;flex-shrink:0;opacity:.8}
+.comments{border-top:1px solid var(--line);padding-top:14px}
+.comment{display:flex;gap:11px;margin-bottom:12px}
+.avatar{
+  width:28px;height:28px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:10px;font-weight:500;color:var(--white);background:var(--blue);
+}
+.avatar.lab{background:var(--purple)}
+.comment-b{flex:1;min-width:0}
+.comment-who{font-size:13px;font-weight:600;color:var(--purple)}
+.comment-when{font-family:var(--mono);font-size:10.5px;color:rgba(28,23,57,.45);margin-left:7px}
+.comment-txt{font-size:13.5px;color:rgba(28,23,57,.75);margin-top:2px}
+.comment-form{display:flex;gap:9px;margin-top:12px}
+.comment-form input{
+  flex:1;border:1px solid var(--line);border-radius:var(--r-pill);padding:9px 15px;background:var(--white);
+}
+.comment-form input:focus{outline:none;border-color:var(--blue)}
+
+/* ---------- rail cards ---------- */
+.card{
+  background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:22px;margin-bottom:20px;
+}
+.card.filled{background:var(--gray);border-color:transparent}
+.card h3{margin-bottom:14px}
+.card .overline{display:block;margin-bottom:12px}
+.am{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+.am .avatar{width:44px;height:44px;font-size:13px}
+.am-name{font-size:15px;font-weight:600;color:var(--purple)}
+.linklist{display:flex;flex-direction:column;gap:11px}
+.linklist a{font-size:13.5px;display:flex;gap:9px;align-items:flex-start}
+.linklist svg{width:14px;height:14px;flex-shrink:0;margin-top:3px;opacity:.75}
+.slug{font-family:var(--mono);font-size:11px;color:rgba(28,23,57,.45);display:block;margin-top:2px;word-break:break-all}
+.contact{font-size:13.5px;margin-bottom:7px}
+
+/* ---------- AM portfolio ---------- */
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:30px}
+.stat{
+  flex:1;min-width:170px;border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px;background:var(--white);
+}
+.stat .n{font-size:32px;font-weight:700;color:var(--purple);line-height:1.1;letter-spacing:-.02em}
+.stat.alert .n{color:var(--coral)}
+.stat .overline{margin-top:6px;display:block}
+.tablewrap{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--white)}
+table{width:100%;border-collapse:collapse}
+thead th{
+  text-align:left;padding:13px 18px;background:var(--gray);border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+  color:rgba(28,23,57,.58);white-space:nowrap;
+}
+tbody td{padding:15px 18px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer;transition:background .15s}
+tbody tr:hover{background:rgba(82,55,233,.03)}
+.labname{font-weight:600;color:var(--purple);font-size:14.5px}
+.tier{font-family:var(--mono);font-size:11px;color:rgba(28,23,57,.60)}
+.minibar{display:flex;align-items:center;gap:9px;min-width:120px}
+.minibar .bar{width:72px;background:rgba(28,23,57,.10)}
+.minibar .bar>span{background:var(--blue)}
+.minibar .n{font-family:var(--mono);font-size:11.5px;color:rgba(28,23,57,.62);white-space:nowrap}
+tr[data-stalled="1"] .minibar .bar>span{background:var(--coral)}
+.days{font-family:var(--mono);font-size:12.5px}
+.days.over{color:var(--coral);font-weight:500}
+.backlink{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--blue);
+}
+
+/* ---------- activity + slack ---------- */
+.feed{display:flex;flex-direction:column;gap:0}
+.feed-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.feed-item:last-child{border-bottom:0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);flex-shrink:0;margin-top:8px}
+.dot.blue{background:var(--blue)} .dot.coral{background:var(--coral)}
+.feed-txt{font-size:13.5px;color:rgba(28,23,57,.78);flex:1}
+.feed-txt b{color:var(--purple);font-weight:600}
+.feed-when{font-family:var(--mono);font-size:10.5px;color:rgba(28,23,57,.42);white-space:nowrap}
+.slackmsg{
+  background:var(--purple);border-radius:var(--r-md);padding:18px 20px;color:rgba(255,255,255,.86);font-size:13.5px;
+}
+.slackmsg .chan{font-family:var(--mono);font-size:11px;color:var(--cyan);margin-bottom:10px;display:block}
+.slackmsg b{color:var(--white)}
+.slackmsg .row{padding:7px 0;border-top:1px solid rgba(255,255,255,.10)}
+
+/* ---------- modal ---------- */
+.scrim{
+  position:fixed;inset:0;background:rgba(28,23,57,.42);display:none;
+  place-items:center;padding:24px;z-index:50;
+}
+.scrim[data-open="1"]{display:grid}
+.modal{
+  background:var(--white);border-radius:var(--r-lg);padding:32px;width:100%;max-width:520px;
+  box-shadow:0 24px 64px rgba(28,23,57,.24);
+}
+.modal h2{margin-bottom:6px}
+.modal>p{font-size:14px;color:rgba(28,23,57,.65);margin-bottom:22px}
+.field{margin-bottom:18px}
+.field label{display:block;margin-bottom:7px}
+.field input,.field select,.field textarea{
+  width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 14px;background:var(--white);
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue)}
+.field textarea{min-height:82px;resize:vertical}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:26px}
+.note{
+  background:var(--cyan-soft);border-radius:var(--r-sm);padding:12px 14px;
+  font-size:12.5px;color:#0d5c80;margin-bottom:22px;
+}
+
+/* ---------- v2: collapsible phases ---------- */
+.phase-head{cursor:pointer;user-select:none}
+.phase-caret{
+  width:18px;height:18px;display:grid;place-items:center;flex:0 0 auto;
+  color:rgba(28,23,57,.42);transition:transform .15s ease;
+}
+.phase[data-collapsed="1"] .phase-caret{transform:rotate(-90deg)}
+.phase[data-collapsed="1"] .task{display:none}
+
+/* ---------- v2: assignee control ---------- */
+.assignrow{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:14px;padding-top:13px;border-top:1px solid var(--line);
+}
+.assignrow label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:rgba(28,23,57,.5)}
+.assignrow select{
+  border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 10px;
+  background:var(--white);font-family:var(--font);font-size:13px;color:var(--ink);
+}
+.assignrow select:focus{outline:none;border-color:var(--blue)}
+
+/* ---------- v2: internal notes ---------- */
+.notesbox{
+  width:100%;border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:11px 13px;min-height:118px;resize:vertical;
+  font-family:var(--font);font-size:13.5px;line-height:1.55;background:var(--white);color:var(--ink);
+}
+.notesbox:focus{outline:none;border-color:var(--blue)}
+.savedflag{font-size:11px;color:rgba(28,23,57,.45);margin-top:8px;display:block}
+
+/* ---------- v2: settings, templates, wide modals ---------- */
+.modal-wide{max-width:760px}
+.modal-scroll{max-height:60vh;overflow:auto;padding-right:8px;margin-right:-8px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.subhead{
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;
+  color:rgba(28,23,57,.5);margin:24px 0 12px;padding-top:18px;border-top:1px solid var(--line);
+}
+.subhead.first{margin-top:0;padding-top:0;border-top:none}
+.rowitem{
+  display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);
+}
+.rowitem:last-child{border-bottom:none}
+.rowitem .grow{flex:1;min-width:0}
+.rowitem input[type=text]{
+  width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 11px;
+  font-family:var(--font);font-size:13.5px;background:var(--white);color:var(--ink);
+}
+.rowitem input:focus{outline:none;border-color:var(--blue)}
+.xbtn{
+  border:none;background:none;cursor:pointer;color:rgba(28,23,57,.4);
+  font-size:17px;line-height:1;padding:4px 8px;border-radius:var(--r-sm);
+}
+.xbtn:hover{background:var(--coral-soft);color:var(--coral)}
+.tmplcard{
+  border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px;
+}
+.tmplcard h4{font-size:14px;margin-bottom:3px}
+.tmplcard p{font-size:12.5px;color:rgba(28,23,57,.6)}
+.emptyhint{font-size:13px;color:rgba(28,23,57,.5);font-style:italic;padding:12px 0;display:block}
+.donetable td{color:rgba(28,23,57,.62)}
+.donetable .labname{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <svg class="logo" viewBox="0 0 195 30" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Confident">
+    <title>Confident</title>
+    <path d="M10.3258 29.6C4.6365 29.6793 0 24.9635 0 19.2382C0 13.5489 4.6365 8.86914 10.3258 8.91241C13.9528 8.91241 17.3058 10.5637 19.1157 14.1113L15.8059 15.9645C14.6378 13.8301 12.6621 12.698 10.3186 12.698C6.8502 12.698 3.98754 15.64 3.98754 19.231C3.98754 22.858 6.8502 25.8432 10.3186 25.8432C12.6548 25.8432 14.6306 24.7111 15.8059 22.5767L19.1157 24.3938C17.2986 27.9848 13.9528 29.6 10.3258 29.6Z" fill="#FFFFFF"/>
+    <path d="M30.2864 29.6434C24.3159 29.6434 19.7227 24.9637 19.7227 19.2384C19.7227 13.5491 24.3592 8.9126 30.2864 8.9126C36.2569 8.9126 40.7708 13.5924 40.7708 19.2384C40.7708 24.9637 36.2136 29.6434 30.2864 29.6434ZM30.2864 25.8506C33.9567 25.8506 36.7761 22.8654 36.7761 19.2744C36.7761 15.6474 33.9567 12.6622 30.2864 12.6622C26.5729 12.6622 23.7102 15.6474 23.7102 19.2744C23.7102 22.8654 26.5729 25.8506 30.2864 25.8506Z" fill="#FFFFFF"/>
+    <path d="M52.8111 12.7415C48.9389 12.7415 47.0065 15.9286 47.0065 19.5989V29.1603H43.0117V19.1951C43.0117 13.4265 46.4368 8.9126 52.8111 8.9126C59.2647 8.9126 62.7691 13.4265 62.7691 19.159V29.1603H58.7744V19.6422C58.7816 15.9286 56.7626 12.7415 52.8111 12.7415Z" fill="#FFFFFF"/>
+    <path d="M97.43 29.6434C91.4235 29.6434 86.9023 25.0069 86.9023 19.3177C86.9023 13.3111 91.2576 8.91257 97.2281 8.91257C99.8889 8.91257 102.312 10.0807 103.92 11.8546L103.963 0.317383H107.958V19.3104C107.958 25.1656 103.401 29.6434 97.43 29.6434ZM97.43 25.8938C101.144 25.8938 103.963 22.9086 103.963 19.2816C103.963 15.6907 101.144 12.7054 97.43 12.7054C93.7598 12.7054 90.8971 15.6907 90.8971 19.2816C90.8971 22.9086 93.7598 25.8938 97.43 25.8938Z" fill="#FFFFFF"/>
+    <path d="M120.695 29.6003C114.689 29.6003 110.211 25.245 110.211 19.1519C110.211 13.4627 114.285 8.82617 120.212 8.82617C126.183 8.82617 129.889 13.1382 129.889 18.6688V20.284H114.083C114.53 23.6731 117.112 26.0526 120.659 26.0526C123.082 26.0526 125.26 25.0071 126.428 22.8294L129.492 24.4014C127.755 27.7832 124.568 29.6003 120.695 29.6003ZM114.242 17.7026H125.902C125.743 14.5587 123.443 12.4171 120.176 12.4171C116.823 12.4243 114.646 14.7606 114.242 17.7026Z" fill="#FFFFFF"/>
+    <path d="M142.237 12.7415C138.365 12.7415 136.432 15.9286 136.432 19.5989V29.1603H132.438V19.1951C132.438 13.4265 135.863 8.9126 142.237 8.9126C148.691 8.9126 152.195 13.4265 152.195 19.159V29.1603H148.2V19.6422C148.207 15.9286 146.188 12.7415 142.237 12.7415Z" fill="#FFFFFF"/>
+    <path d="M164.695 29.6793C159.784 29.4269 157.152 26.5715 157.152 22.0576V12.8639H153.922V9.39551H157.152V3.74951H161.147V9.39551H168.098V12.8639H161.147V21.935C161.147 24.5164 162.676 26.0451 165.055 26.0451C166.346 26.0451 167.154 25.8216 168.12 25.1293L169.98 27.9848C168.971 28.6842 166.771 29.7875 164.695 29.6793Z" fill="#FFFFFF"/>
+    <path d="M77.6519 3.68475C76.563 3.67754 75.4886 3.92992 74.5152 4.42025C73.5417 4.91057 72.7053 5.61723 72.0707 6.49694C71.566 7.17474 71.2848 8.42941 71.2559 9.26586H77.1832V12.7414H71.2559V28.9872H67.1963V12.7414H65.1484V9.26586H67.1963C67.2035 7.77324 67.6506 5.8696 68.4798 4.61493C69.3956 3.21605 70.6647 2.07676 72.1573 1.298C73.8446 0.411079 75.7266 -0.0359866 77.6374 6.70571e-05L77.6519 3.68475Z" fill="#FFFFFF"/>
+    <path d="M80.7435 4.43481C80.3253 3.98775 80.0945 3.40368 80.1017 2.79797C80.1089 2.22112 80.3325 1.6731 80.7435 1.26209C80.9238 1.04577 81.1473 0.865499 81.3997 0.742916C81.652 0.620334 81.9332 0.548226 82.2145 0.541016C82.5173 0.548226 82.8202 0.613123 83.0942 0.735705C83.3682 0.858288 83.6134 1.03856 83.8153 1.26209C84.0316 1.45678 84.2046 1.69473 84.32 1.96153C84.4426 2.22833 84.5003 2.50955 84.5075 2.79797C84.5075 3.10083 84.4498 3.40368 84.3272 3.68489C84.2118 3.96611 84.0316 4.21849 83.8153 4.43481C83.6134 4.65834 83.3682 4.83861 83.0942 4.96119C82.8202 5.08378 82.5173 5.15588 82.2145 5.15588C81.9332 5.14867 81.652 5.08378 81.3997 4.95398C81.1401 4.8314 80.9165 4.65834 80.7435 4.43481ZM80.3902 9.266H84.2912V29.0522H80.3902V9.266Z" fill="#FFFFFF"/>
+    <path d="M176.799 22.0651C175.725 20.2119 175.335 18.1497 175.544 16.1956C172.826 16.7724 170.785 19.1592 170.785 22.0507C170.785 25.3676 173.46 28.0644 176.785 28.0861C178.558 28.0861 180.166 27.3217 181.277 26.1103C179.46 25.2811 177.873 23.9182 176.799 22.0651Z" fill="#F36344"/>
+    <path d="M193.692 12.3161C190.995 7.63638 185.017 6.05002 180.359 8.73241C177.54 10.362 175.845 13.1598 175.535 16.1739C175.946 16.0946 176.357 16.0513 176.811 16.0513C180.128 16.0513 182.811 18.7481 182.811 22.0867C182.811 23.6298 182.212 25.0359 181.268 26.1031C184.029 27.3361 187.303 27.2784 190.13 25.6488C194.788 22.952 196.374 16.9743 193.692 12.3161Z" fill="#5CCEFF"/>
+    <path d="M176.822 16.0513C176.39 16.0513 175.957 16.0945 175.546 16.1739C175.337 18.1712 175.733 20.2119 176.801 22.065C177.868 23.9182 179.461 25.281 181.271 26.0814C182.216 25.007 182.814 23.6081 182.814 22.065C182.814 18.7697 180.139 16.0657 176.822 16.0513Z" fill="#5237E9"/>
+  </svg>
+  <span class="draftflag">Onboarding Portal · Draft</span>
+  <span class="spacer"></span>
+  <button class="resetbtn" id="btnSettings" onclick="openUserSettings()" title="Change your name and role">Your settings</button>
+  <button class="resetbtn" onclick="resetState()" title="Clear saved demo state and start over">Reset demo</button>
+  <div class="switcher" role="group" aria-label="Switch role">
+    <button id="btnLab" aria-pressed="true" onclick="setRole('lab')">Lab view</button>
+    <button id="btnAm" aria-pressed="false" onclick="setRole('am')">Account manager</button>
+  </div>
+</div>
+
+<div class="page" id="app"></div>
+
+<div class="scrim" id="scrim" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+/* =====================================================================
+   Confident Onboarding Portal — first draft
+   Single-file prototype. All state is in memory (no persistence).
+   Seed content marked PLACEHOLDER is invented and must be replaced with
+   the real Notion checklist rows (see Open Item #1 in the project outline).
+   ===================================================================== */
+
+const TODAY = new Date('2026-09-08T12:00:00Z');
+
+/* ---------- Phase (outline §6) ----------
+   These are the portal-wide defaults. v2 lets an account manager rename phases
+   for one lab without touching the defaults, so nothing reads PHASES directly —
+   every caller goes through phasesFor(lab), which layers lab.phaseNames on top. */
+const PHASES = [
+  {id:'p1', order:1, name:'Kickoff & Access',      blurb:'Get everyone into the system and aligned on scope.'},
+  {id:'p2', order:2, name:'Lab Configuration',     blurb:'Tell us what you test and what you charge.'},
+  {id:'p3', order:3, name:'Data & Methods',        blurb:'Wire your instruments and compliance rules into Confident.'},
+  {id:'p4', order:4, name:'Validation & Go-Live',  blurb:'Prove it works on real samples, then switch over.'}
+];
+
+/* ---------- Document (outline §4/§6) — real filenames from Notion ---------- */
+const DOCS = {
+  guide:   {id:'d-guide',  title:'Confident Client Onboarding Guide 2.0', file:'Confident_Client_Onboarding_Guide_2.0_-_Generic.pdf', shared:true},
+  metrc:   {id:'d-metrc',  title:'Confident Lab Metrc Training (v2)',     file:'Confident_Lab_Metrc_Training_(v2).pdf',              shared:true, tiers:['Premium']},
+  planStarter: {id:'d-p1', title:'Starter Plan Overview',  file:'Confident_Starter_Plan.pdf',  tiers:['Starter']},
+  planPro:     {id:'d-p2', title:'Pro Plan Overview',      file:'Confident_Pro_Plan.pdf',      tiers:['Pro']},
+  planPremium: {id:'d-p3', title:'Premium Plan Overview',  file:'Confident_Premium_Plan.pdf',  tiers:['Premium']},
+  planBasic:   {id:'d-p4', title:'Basic Plan Overview',    file:'Confident_Basic_Plan.pdf',    tiers:['Basic']}
+};
+
+/* ---------- HelpArticle (outline §5.5) — curated help-center links ---------- */
+const H = (slugPath, title) => ({title, url:'https://help.confidentlims.com/for-labs/'+slugPath});
+const HELP = {
+  login:     H('logging-in',            'How to log in and reset your password'),
+  users:     H('managing-users',         'Adding and managing lab users'),
+  analytes:  H('analyte-lists',          'Building your analyte list'),
+  panels:    H('test-panels',            'How test panels work in Confident'),
+  pricing:   H('pricing-and-orders',     'Setting up pricing for client orders'),
+  coa:       H('coa-templates',          'Customizing your COA template'),
+  importers: H('csv-importers',          'Instrument exports and CSV importers'),
+  limits:    H('compliance-limits',      'Compliance limits and state rules'),
+  metrc:     H('metrc-integration',      'Connecting Metrc'),
+  samples:   H('receiving-samples',      'Receiving and logging samples')
+};
+
+/* ---------- Template task set (outline §5.3) — PLACEHOLDER content ---------- */
+const TEMPLATE_TASKS = [
+  {t:'Attend the onboarding kickoff call',                 ph:'p1', side:'confident', desc:'Your account manager walks your team through the onboarding plan, timeline, and what we need from you. Roughly 45 minutes.', help:[]},
+  {t:'Confirm your lab admin users and email addresses',   ph:'p1', side:'lab',       desc:'Send us the names and email addresses of everyone who needs an account, and flag who should have admin rights.', help:['users'], docs:['guide']},
+  {t:'Log in to Confident and set your password',          ph:'p1', side:'lab',       desc:'You will get an invite email. Use the lab login link in the Lab Links panel if you need it again.', help:['login']},
+  {t:'Review the Client Onboarding Guide 2.0',             ph:'p1', side:'lab',       desc:'Skim it once end to end. It explains the vocabulary the rest of these tasks assume.', help:[], docs:['guide']},
+  {t:'Provision your lab tenant in Confident',             ph:'p1', side:'confident', desc:'We create your lab environment, apply your plan, and enable the modules included in your tier.', help:[]},
+
+  {t:'Provide your analyte list',                          ph:'p2', side:'lab',       desc:'A spreadsheet of every analyte you report, with the exact names you want printed on the COA.', help:['analytes']},
+  {t:'Provide your assay and test panel menu',             ph:'p2', side:'lab',       desc:'Which panels you sell, and which analytes belong to each. This drives ordering and COA layout.', help:['panels']},
+  {t:'Provide your client-facing pricing sheet',           ph:'p2', side:'lab',       desc:'Per-panel and per-sample pricing, plus any rush or bundle pricing you want reflected in the order form.', help:['pricing']},
+  {t:'Configure test panels in Confident',                 ph:'p2', side:'confident', desc:'We build your panels from the menu you sent and send back a preview for approval.', help:['panels']},
+  {t:'Confirm your COA template preferences',              ph:'p2', side:'lab',       desc:'Logo, header, disclaimer text, which fields appear, and whether you want a client-facing summary page.', help:['coa']},
+
+  {t:'Provide your instrument list and export formats',    ph:'p3', side:'lab',       desc:'Make, model, and software for each instrument, plus one sample export file per instrument.', help:['importers']},
+  {t:'Upload sample instrument export files',             ph:'p3', side:'lab',       desc:'Raw exports, unedited. We use these to build the importers, so representative files matter more than clean ones.', help:['importers']},
+  {t:'Build your CSV importer configurations',             ph:'p3', side:'confident', desc:'We map each export format to Confident analytes so results land in the right fields automatically.', help:['importers']},
+  {t:'Provide LOD/LOQ values and method references',       ph:'p3', side:'lab',       desc:'Per analyte, per matrix if they differ. These print on the COA and drive pass/fail logic.', help:['limits']},
+  {t:'Configure compliance limits and state rules',        ph:'p3', side:'confident', desc:'We load your state action limits and configure pass/fail thresholds for each panel.', help:['limits']},
+  {t:'Provide Metrc credentials and license numbers',      ph:'p3', side:'lab',       desc:'Required only if you report to Metrc. Included in Premium onboarding.', help:['metrc'], docs:['metrc'], tiers:['Premium']},
+
+  {t:'Run a parallel test batch in Confident',             ph:'p4', side:'lab',       desc:'Log a real batch in Confident alongside your current process and compare the output.', help:['samples']},
+  {t:'Review and approve your COA output',                 ph:'p4', side:'lab',       desc:'Sign off on the generated COA, or send edits. We iterate until you are happy with it.', help:['coa']},
+  {t:'Confirm go-live date and client communications',     ph:'p4', side:'confident', desc:'We agree a cutover date and help you draft the note that goes to your clients.', help:[]}
+];
+
+/* ---------- v2: Task Template library ----------
+   A Task Template stores the task information — title, description, phase, which
+   side owns it — so an account manager can drop a known task into any lab without
+   retyping it. Seeded from the built-in set above so the library opens populated. */
+let TMPL_ID = 0;
+const TASK_TEMPLATES = TEMPLATE_TASKS.map(t => ({
+  id:'tt'+(++TMPL_ID),
+  title:t.t, desc:t.desc, phase:t.ph, side:t.side,
+  help:(t.help||[]).slice(), docs:(t.docs||[]).slice(),
+  builtin:true
+}));
+
+/* ---------- v2: Phase Templates ----------
+   A Phase Template is the list of phases and tasks that a given Product + Plan
+   combination starts with. Creating a lab from a template copies these task
+   templates in; picking "blank" copies nothing. */
+let PTMPL_ID = 0;
+const PHASE_TEMPLATES = [
+  {id:'pt'+(++PTMPL_ID), name:'LIMS — Starter',       line:'LIMS',         tier:'Starter',
+   phaseNames:{}, taskIds:TASK_TEMPLATES.filter(t=>!/Metrc/i.test(t.title)).map(t=>t.id)},
+  {id:'pt'+(++PTMPL_ID), name:'LIMS — Pro',           line:'LIMS',         tier:'Pro',
+   phaseNames:{}, taskIds:TASK_TEMPLATES.filter(t=>!/Metrc/i.test(t.title)).map(t=>t.id)},
+  {id:'pt'+(++PTMPL_ID), name:'LIMS — Premium',       line:'LIMS',         tier:'Premium',
+   phaseNames:{}, taskIds:TASK_TEMPLATES.map(t=>t.id)},
+  {id:'pt'+(++PTMPL_ID), name:'Network Only — Basic', line:'Network Only', tier:'Basic',
+   phaseNames:{p3:'Data Handoff'}, taskIds:TASK_TEMPLATES.filter(t=>t.phase!=='p3').map(t=>t.id)}
+];
+
+/* ---------- Lab (outline §6) — real lab names from the Notion hub ----------
+   v2 adds abbrev / state (captured on the Create New Lab form) and users, which
+   is what the per-task assignee picker offers on the lab side. */
+const LABS = [
+  {slug:'sky-analytics',      name:'Sky Analytics',         abbrev:'SKY',  state:'CO', line:'LIMS',         tier:'Pro',     am:'Elliot Reese',   start:'2026-07-14', done:8,  users:['Priya Raman','Marco Deleon']},
+  {slug:'montana-analytical', name:'Montana Analytical',    abbrev:'MTA',  state:'MT', line:'LIMS',         tier:'Premium', am:'Elliot Reese',   start:'2026-06-02', done:15, users:['Hannah Wexler','Cole Brannan']},
+  {slug:'phytolab-mn',        name:'PhytoLab MN',           abbrev:'PLM',  state:'MN', line:'LIMS',         tier:'Starter', am:'Elliot Reese',   start:'2026-08-19', done:3,  users:['Tom Reyes','Sarah Lindqvist']},
+  {slug:'chri-laboratories',  name:'ChRi Laboratories',     abbrev:'CHRI', state:'OR', line:'LIMS',         tier:'Pro',     am:'Elliot Reese',   start:'2026-05-11', done:11, users:['Dev Chaudhary','Ana Ruiz']},
+  {slug:'sc-laboratories-ca', name:'SC Laboratories CA',    abbrev:'SCL',  state:'CA', line:'LIMS',         tier:'Premium', am:'Dana Whitfield', start:'2026-07-28', done:9,  users:['Jordan Pike','Mei Tanaka']},
+  {slug:'cannabis-chemlab',   name:'Cannabis ChemLab MN',   abbrev:'CCM',  state:'MN', line:'Network Only', tier:'Pro',     am:'Dana Whitfield', start:'2026-08-04', done:6,  users:['Ben Hollis','Rachel Adeyemi']},
+  {slug:'trumo-analytics',    name:'TruMo Analytics',       abbrev:'TRU',  state:'MO', line:'LIMS',         tier:'Starter', am:'Dana Whitfield', start:'2026-08-25', done:2,  users:['Kayla Struthers','Owen Petrakis']},
+  {slug:'alien-testing-nm',   name:'Alien Testing Labs NM', abbrev:'ATL',  state:'NM', line:'Network Only', tier:'Basic',   am:'Marcus Oyelaran',start:'2026-06-16', done:12, users:['Luis Ortega','Fern Whitlock']},
+  {slug:'optiq-health',       name:'Optiq Health Labs',     abbrev:'OPT',  state:'MA', line:'LIMS',         tier:'Premium', am:'Marcus Oyelaran',start:'2026-04-20', done:17, users:['Nina Barzani','Greg Sandoval']},
+  {slug:'steadfast-labs-ny',  name:'Steadfast Labs NY',     abbrev:'STL',  state:'NY', line:'Network Only', tier:'Premium', am:'Marcus Oyelaran',start:'2026-08-11', done:5,  users:['Aaron Feldman','Chloe Mbeki']},
+  {slug:'lifted-testing',     name:'Lifted Testing',        abbrev:'LFT',  state:'MI', line:'LIMS',         tier:'Pro',     am:'Dana Whitfield', start:'2026-07-07', done:10, users:['Nadia Okafor','Jim Castellano']},
+  /* v2 seeds two finished labs so the Completed labs section on the dashboard has
+     something to show. done is set past the task count, which marks every task done. */
+  {slug:'greenline-labs-wa',  name:'GreenLine Labs WA',     abbrev:'GLW',  state:'WA', line:'LIMS',         tier:'Starter', am:'Elliot Reese',   start:'2026-03-09', done:99, users:['Erin Vasquez','Paul Nakamura']},
+  {slug:'crescent-analytics', name:'Crescent Analytics',    abbrev:'CRA',  state:'AZ', line:'Network Only', tier:'Pro',     am:'Dana Whitfield', start:'2026-02-24', done:99, users:['Sofia Marchetti','Dale Pruitt']}
+];
+
+/* Every lab carries the same v2 config slots. Filling them here rather than in
+   each literal keeps the seed rows readable and — more importantly — means labs
+   restored from localStorage or created through the form get the same shape, so
+   no renderer has to guard against a missing field. */
+function normalizeLab(l){
+  if(!Array.isArray(l.users))       l.users = [];
+  if(!l.phaseNames || typeof l.phaseNames !== 'object') l.phaseNames = {};
+  if(!Array.isArray(l.docBundle))   l.docBundle = [];
+  if(typeof l.internalNotes !== 'string') l.internalNotes = '';
+  if(typeof l.abbrev !== 'string')  l.abbrev = '';
+  if(typeof l.state !== 'string')   l.state = '';
+  return l;
+}
+LABS.forEach(normalizeLab);
+
+/* Resolve the phase list for one lab: defaults, with any AM rename layered on. */
+function phasesFor(l){
+  const over = (l && l.phaseNames) || {};
+  return PHASES.map(p => over[p.id] ? {...p, name:over[p.id]} : p);
+}
+function phaseOfLab(l, id){ return phasesFor(l).find(p => p.id === id); }
+
+/* ---------- build Task rows per lab from the template ---------- */
+let TASK_ID = 0;
+function buildTasks(lab){
+  const applicable = TEMPLATE_TASKS.filter(t => !t.tiers || t.tiers.includes(lab.tier));
+  const startMs = new Date(lab.start+'T12:00:00Z').getTime();
+  return applicable.map((t,i)=>({
+    id:'t'+(++TASK_ID),
+    title:t.t, desc:t.desc, phase:t.ph, ownerSide:t.side,
+    assignee: t.side==='lab' ? lab.name+' team' : lab.am,
+    status: i < lab.done ? 'Done' : 'Not started',
+    dueDate: new Date(startMs + (i+1)*4*864e5).toISOString().slice(0,10),
+    completedAt: i < lab.done ? new Date(startMs + (i+1)*3.4*864e5).toISOString().slice(0,10) : null,
+    source:'template', createdBy:'Onboarding template ('+lab.line+' '+lab.tier+')',
+    order:i, help:(t.help||[]).map(k=>HELP[k]), docs:(t.docs||[]).map(k=>DOCS[k]),
+    comments:[]
+  }));
+}
+/* v2 adds user settings. The demo can be viewed as either side, so it carries one
+   identity per side and swaps which is "you" with the role toggle. currentUser is
+   kept in step with me.am.name because the My-labs filter matches on it. */
+const STATE = {
+  role:'lab', labSlug:'sky-analytics', amScope:'mine', amLab:null,
+  currentUser:'Elliot Reese',
+  me:{
+    lab:{name:'Priya Raman',  role:'Lab Director'},
+    am: {name:'Elliot Reese', role:'Account Manager'}
+  }
+};
+/* Who you are right now, given the side you are viewing from. */
+const meNow = () => STATE.me[STATE.role];
+const TASKS = {};
+LABS.forEach(l => TASKS[l.slug] = buildTasks(l));
+
+/* a few non-template tasks, to show two-sided creation (outline §5.4) */
+TASKS['sky-analytics'].push({
+  id:'t'+(++TASK_ID), title:'Send us the Q3 client list for network invites',
+  desc:'Added after the kickoff call — Sky wants their existing clients invited before go-live.',
+  phase:'p2', ownerSide:'lab', assignee:'Sky Analytics team', status:'In progress',
+  dueDate:'2026-09-12', completedAt:null, source:'am-created', createdBy:'Elliot Reese (Account Manager)',
+  order:99, help:[], docs:[],
+  comments:[{who:'Elliot Reese', role:'confident', when:'2 days ago', txt:'No rush on this one, but it unblocks the client invite step later.'}]
+});
+TASKS['sky-analytics'].push({
+  id:'t'+(++TASK_ID), title:'Help — our terpene export has two header rows',
+  desc:'Raised by the lab. The GC export from the new instrument has a merged header that the importer is choking on.',
+  phase:'p3', ownerSide:'confident', assignee:'Elliot Reese', status:'In progress',
+  dueDate:'2026-09-10', completedAt:null, source:'lab-created', createdBy:'Priya Raman (Sky Analytics)',
+  order:98, help:[HELP.importers], docs:[],
+  comments:[
+    {who:'Priya Raman', role:'lab', when:'yesterday', txt:'Attached two exports. The second one is from the new GC.'},
+    {who:'Elliot Reese', role:'confident', when:'4 hours ago', txt:'Got them — we can handle the merged header in the importer config. No change needed on your side.'}
+  ]
+});
+TASKS['phytolab-mn'].push({
+  id:'t'+(++TASK_ID), title:'Help — can we report two matrices on one COA?',
+  desc:'Raised by the lab during setup.', phase:'p2', ownerSide:'confident',
+  assignee:'Elliot Reese', status:'Not started', dueDate:'2026-09-11', completedAt:null,
+  source:'lab-created', createdBy:'Tom Reyes (PhytoLab MN)', order:97, help:[HELP.coa], docs:[], comments:[]
+});
+
+/* ---------- ActivityEvent stream (outline §6 / §5.7) ---------- */
+const ACTIVITY = [
+  {kind:'complete', lab:'Sky Analytics',      txt:'<b>Priya Raman</b> completed “Provide your client-facing pricing sheet”', when:'3h ago'},
+  {kind:'created',  lab:'PhytoLab MN',        txt:'<b>Tom Reyes</b> raised a request: “Can we report two matrices on one COA?”', when:'5h ago'},
+  {kind:'complete', lab:'Optiq Health Labs',  txt:'<b>Marcus Oyelaran</b> completed “Configure compliance limits and state rules”', when:'yesterday'},
+  {kind:'phase',    lab:'Montana Analytical', txt:'<b>Montana Analytical</b> moved into <b>Validation &amp; Go-Live</b>', when:'yesterday'},
+  {kind:'stall',    lab:'ChRi Laboratories',  txt:'<b>ChRi Laboratories</b> has had no activity for 9 days', when:'2d ago'},
+  {kind:'complete', lab:'Lifted Testing',     txt:'<b>Nadia Okafor</b> completed “Upload sample instrument export files”', when:'2d ago'}
+];
+
+/* ---------- demo persistence ----------
+   The real product keeps this server-side (outline §6). For the prototype we
+   snapshot the mutable slice of the world into localStorage so a refresh does
+   not wipe the walkthrough. Everything is wrapped: private-mode browsers and
+   quota errors must degrade to in-memory, never to a broken page. */
+/* v2 bumps the schema: labs are now mutable (the Create New Lab form pushes into
+   LABS, Lab Settings edits them) so the lab list has to be saved too, otherwise a
+   lab created in the demo disappears on the next refresh. Old v1 payloads are
+   ignored rather than migrated — this is a prototype, and a clean reseed is a
+   better failure mode than a half-converted one. */
+const STORE_KEY = 'confident-onboarding-portal/v2';
+function saveState(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      v:2, taskId:TASK_ID, tmplId:TMPL_ID, ptmplId:PTMPL_ID,
+      tasks:TASKS, activity:ACTIVITY, labs:LABS,
+      taskTemplates:TASK_TEMPLATES, phaseTemplates:PHASE_TEMPLATES,
+      me:STATE.me,
+      view:{role:STATE.role, labSlug:STATE.labSlug, amScope:STATE.amScope, amLab:STATE.amLab}
+    }));
+  }catch(e){ /* no-op: demo continues in memory */ }
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(!d || d.v !== 2 || !d.tasks) return false;
+
+    /* Labs first: everything below is keyed off the lab list, and a saved lab may
+       not exist in the seed set at all now that labs can be created in-app. */
+    if(Array.isArray(d.labs) && d.labs.length && d.labs.every(l => l && typeof l.slug === 'string')){
+      LABS.length = 0;
+      d.labs.forEach(l => LABS.push(normalizeLab(l)));
+    }
+    if(Array.isArray(d.taskTemplates) && d.taskTemplates.length){
+      TASK_TEMPLATES.length = 0;
+      d.taskTemplates.forEach(t => TASK_TEMPLATES.push(t));
+    }
+    if(Array.isArray(d.phaseTemplates) && d.phaseTemplates.length){
+      PHASE_TEMPLATES.length = 0;
+      d.phaseTemplates.forEach(t => PHASE_TEMPLATES.push(t));
+    }
+    if(typeof d.tmplId  === 'number') TMPL_ID  = Math.max(TMPL_ID,  d.tmplId);
+    if(typeof d.ptmplId === 'number') PTMPL_ID = Math.max(PTMPL_ID, d.ptmplId);
+    if(d.me && d.me.lab && d.me.am){
+      if(typeof d.me.lab.name === 'string' && d.me.lab.name) STATE.me.lab.name = d.me.lab.name;
+      if(typeof d.me.lab.role === 'string' && d.me.lab.role) STATE.me.lab.role = d.me.lab.role;
+      if(typeof d.me.am.name  === 'string' && d.me.am.name){ STATE.me.am.name = d.me.am.name; STATE.currentUser = d.me.am.name; }
+      if(typeof d.me.am.role  === 'string' && d.me.am.role)  STATE.me.am.role  = d.me.am.role;
+    }
+
+    /* Only adopt task lists for labs that exist, so editing seed data can never
+       orphan saved state into an unrenderable shape. */
+    let adopted = 0;
+    LABS.forEach(l => {
+      if(Array.isArray(d.tasks[l.slug])){ TASKS[l.slug] = d.tasks[l.slug]; adopted++; }
+      else if(!TASKS[l.slug]){ TASKS[l.slug] = buildTasks(l); }
+    });
+    if(!adopted) return false;
+    if(Array.isArray(d.activity)){ ACTIVITY.length = 0; d.activity.forEach(a => ACTIVITY.push(a)); }
+    if(typeof d.taskId === 'number') TASK_ID = Math.max(TASK_ID, d.taskId);
+    if(d.view){
+      if(d.view.role === 'lab' || d.view.role === 'am') STATE.role = d.view.role;
+      if(LABS.some(l => l.slug === d.view.labSlug)) STATE.labSlug = d.view.labSlug;
+      if(d.view.amScope === 'mine' || d.view.amScope === 'all') STATE.amScope = d.view.amScope;
+      if(d.view.amLab === null || LABS.some(l => l.slug === d.view.amLab)) STATE.amLab = d.view.amLab;
+    }
+    return true;
+  }catch(e){ return false; }
+}
+function resetState(){
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  location.reload();
+}
+
+/* ---------- helpers ---------- */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lab = () => LABS.find(l => l.slug === STATE.labSlug);
+const tasksFor = s => TASKS[s].slice().sort((a,b)=>a.order-b.order);
+const isDone = t => t.status === 'Done';
+const daysIn = l => Math.round((TODAY - new Date(l.start+'T12:00:00Z'))/864e5);
+const progress = s => { const t = tasksFor(s); return {done:t.filter(isDone).length, total:t.length}; };
+const nextTask = s => tasksFor(s).find(t => !isDone(t));
+const overdue = t => !isDone(t) && new Date(t.dueDate+'T12:00:00Z') < TODAY;
+const initials = n => n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+/* Phase lookups go through the lab so an AM rename in Lab Settings shows up
+   everywhere the phase is named, not just in the task list. */
+const phaseOf = id => PHASES.find(p=>p.id===id);
+function currentPhase(s){
+  const l = LABS.find(x=>x.slug===s), list = phasesFor(l), n = nextTask(s);
+  return (n && list.find(p=>p.id===n.phase)) || list[list.length-1];
+}
+
+/* v2: the Document Bundle. Lab Settings ships it blank and an account manager
+   fills it from their view; while it is empty the lab still sees the documents
+   its plan implies, so no lab ever lands on an empty shelf. */
+const ALL_DOCS = () => Object.keys(DOCS).map(k => ({key:k, ...DOCS[k]}));
+function planDocs(l){
+  const plan = {Starter:DOCS.planStarter, Pro:DOCS.planPro, Premium:DOCS.planPremium, Basic:DOCS.planBasic}[l.tier];
+  const out = [plan, DOCS.guide];
+  if (l.tier === 'Premium') out.push(DOCS.metrc);
+  return out.filter(Boolean);
+}
+function docsFor(l){
+  if(l && Array.isArray(l.docBundle) && l.docBundle.length){
+    return l.docBundle.map(k => DOCS[k]).filter(Boolean);
+  }
+  return planDocs(l);
+}
+const LAB_LINKS = l => [
+  {title:'Lab login',           url:'https://accounts.confidentlims.com/login?lab='+l.slug},
+  {title:'Submit a new order',  url:'https://accounts.confidentlims.com/login?redirectToApp=labtesting&redirectToPath=orders/new/samples?lab='+l.slug},
+  {title:'Help Articles',       url:'https://help.confidentlims.com'}
+];
+
+const ICON = {
+  check:'<svg viewBox="0 0 12 12" fill="none"><path d="M2 6.2 4.6 8.8 10 3.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  doc:'<svg viewBox="0 0 16 16" fill="none"><path d="M9 1.5H4.5A1.5 1.5 0 0 0 3 3v10A1.5 1.5 0 0 0 4.5 14.5h7A1.5 1.5 0 0 0 13 13V5.5L9 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 1.5V5.5H13" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+  help:'<svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.4" stroke="currentColor" stroke-width="1.3"/><path d="M6.4 6.2a1.7 1.7 0 0 1 3.3.6c0 1.1-1.6 1.3-1.6 2.3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8.1" cy="11.3" r=".75" fill="currentColor"/></svg>',
+  ext:'<svg viewBox="0 0 16 16" fill="none"><path d="M9.5 2.5H13.5V6.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.5 2.5 7.5 8.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M12 10v2.5a1 1 0 0 1-1 1H3.5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  back:'<svg viewBox="0 0 16 16" fill="none" style="width:12px;height:12px"><path d="M9.5 3.5 5 8l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  /* Points down at rest; the .phase-caret rule rotates it -90deg when collapsed. */
+  caret:'<svg viewBox="0 0 16 16" fill="none"><path d="M4 6.5 8 10.5l4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+
+/* ---------- render: task list (shared by both roles, outline §5.2) ---------- */
+/* Which phases are collapsed, keyed by lab + phase so collapsing a phase on one
+   lab does not collapse it on another. Kept out of STATE because it is view chrome,
+   not data — losing it on refresh costs nothing. */
+const COLLAPSED = {};
+const ckey = (slug,pid) => slug+':'+pid;
+function togglePhase(slug, pid){
+  const k = ckey(slug,pid);
+  COLLAPSED[k] = !COLLAPSED[k];
+  /* Flip the attribute in place rather than re-rendering: collapsing is a pure
+     view change, and a full re-render here would fight the user's scroll position. */
+  const el = document.querySelector('[data-phase-key="'+k+'"]');
+  if(el){
+    el.setAttribute('data-collapsed', COLLAPSED[k] ? '1' : '0');
+    const btn = el.querySelector('.phase-head');
+    if(btn) btn.setAttribute('aria-expanded', COLLAPSED[k] ? 'false' : 'true');
+  }
+}
+
+function renderTasks(slug, mode){
+  const l = LABS.find(x=>x.slug===slug);
+  const all = tasksFor(slug);
+  return phasesFor(l).map(p => {
+    const ts = all.filter(t=>t.phase===p.id);
+    if(!ts.length) return '';
+    const d = ts.filter(isDone).length;
+    const k = ckey(slug,p.id), col = !!COLLAPSED[k];
+    return `<div class="phase" data-phase-key="${esc(k)}" data-collapsed="${col?1:0}">
+      <div class="phase-head" role="button" tabindex="0" aria-expanded="${col?'false':'true'}"
+        onclick="togglePhase('${slug}','${p.id}')"
+        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePhase('${slug}','${p.id}')}">
+        <span class="phase-caret" aria-hidden="true">${ICON.caret}</span>
+        <span class="phase-badge">Phase ${p.order}</span>
+        <h3>${esc(p.name)}</h3>
+        <div class="phase-meter">
+          <div class="bar"><span style="width:${Math.round(d/ts.length*100)}%"></span></div>
+          <span class="n">${d}/${ts.length}</span>
+        </div>
+      </div>
+      ${ts.map(t=>renderTask(t,l,mode)).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* v2: who a task can be assigned to. A lab-owned task goes to the whole lab team or
+   to one named person on it; a Confident-owned task goes to the account manager. The
+   current value is always included even if it is no longer on either list, so an
+   assignee never silently disappears from the dropdown that is meant to show it. */
+function assignOptions(l,t){
+  const base = t.ownerSide==='lab'
+    ? [l.name+' team', ...(l.users||[])]
+    : [l.am];
+  return base.includes(t.assignee) ? base : [t.assignee, ...base];
+}
+function setAssignee(id, who){
+  /* findTask returns {t, slug} — the wrapper, not the task. Destructure it, and take
+     the lab from the slug it hands back rather than searching for the task again. */
+  const {t, slug} = findTask(id) || {};
+  if(!t || t.assignee === who) return;
+  const l = LABS.find(x => x.slug === slug);
+  t.assignee = who;
+  ACTIVITY.unshift({kind:'assigned', lab: l ? l.name : '', txt:`<b>${esc(t.title)}</b> assigned to ${esc(who)}`, when:'just now'});
+  saveState();
+  /* No re-render: the select already shows the new value, and re-rendering would
+     collapse the expanded task the user is looking at. */
+}
+
+function renderTask(t,l,mode){
+  const done = isDone(t);
+  const mine = (mode==='lab' && t.ownerSide==='lab') || (mode==='am' && t.ownerSide==='confident');
+  const sideChip = t.ownerSide==='lab'
+    ? `<span class="chip chip-lab">${mode==='lab' ? 'Your team' : 'Waiting on lab'}</span>`
+    : `<span class="chip chip-conf">${mode==='lab' ? 'Confident' : 'Waiting on us'}</span>`;
+  const srcChip = t.source==='template' ? ''
+    : `<span class="chip chip-src">${t.source==='lab-created' ? 'Lab added' : 'AM added'}</span>`;
+  const lateChip = overdue(t) ? `<span class="chip chip-late">Overdue</span>` : '';
+  const attach = [
+    ...(t.docs||[]).map(d=>`<a href="#" onclick="return false">${ICON.doc}<span>${esc(d.title)} <span class="muted mono" style="font-size:11px">PDF</span></span></a>`),
+    ...(t.help||[]).map(h=>`<a href="${esc(h.url)}" target="_blank" rel="noopener">${ICON.help}<span>${esc(h.title)}</span></a>`)
+  ].join('');
+
+  return `<div class="task" data-done="${done?1:0}" id="task-${t.id}">
+    <div class="task-row">
+      <button class="check" data-done="${done?1:0}" onclick="toggle('${t.id}')"
+        aria-label="${done?'Mark not done':'Mark done'}" ${!mine&&!done?'title="Owned by the other side — you can still tick it if it is finished"':''}>${ICON.check}</button>
+      <div class="task-body">
+        <button class="task-title" onclick="openTask('${t.id}')">${esc(t.title)}</button>
+        <div class="task-meta">
+          ${sideChip}${srcChip}${lateChip}
+          <span class="task-date">${done ? 'Completed '+t.completedAt : 'Due '+t.dueDate}</span>
+          ${t.comments.length?`<span class="task-date">· ${t.comments.length} comment${t.comments.length>1?'s':''}</span>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="task-expand">
+      <p class="task-desc">${esc(t.desc)}</p>
+      ${attach?`<div class="attach">${attach}</div>`:''}
+      <div class="comments">
+        <span class="overline">Discussion</span>
+        <div style="margin-top:12px">
+        ${t.comments.map(c=>`<div class="comment">
+            <div class="avatar ${c.role==='lab'?'lab':''}">${initials(c.who)}</div>
+            <div class="comment-b">
+              <div><span class="comment-who">${esc(c.who)}</span><span class="comment-when">${esc(c.when)}</span></div>
+              <p class="comment-txt">${esc(c.txt)}</p>
+            </div>
+          </div>`).join('') || '<p class="muted" style="font-size:13.5px;margin-bottom:10px">No comments yet.</p>'}
+        </div>
+        <form class="comment-form" onsubmit="addComment(event,'${t.id}')">
+          <input placeholder="Add a comment…" aria-label="Add a comment">
+          <button class="btn-blue" type="submit">Post</button>
+        </form>
+        <div class="assignrow">
+          <label for="as-${t.id}">Assigned to</label>
+          <select id="as-${t.id}" onchange="setAssignee('${t.id}', this.value)">
+            ${assignOptions(l,t).map(n=>`<option value="${esc(n)}"${n===t.assignee?' selected':''}>${esc(n)}</option>`).join('')}
+          </select>
+        </div>
+        <p class="muted mono" style="font-size:10.5px;margin-top:8px">
+          Created by ${esc(t.createdBy)}
+        </p>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- render: lab view (outline §5.1) ---------- */
+function renderLab(){
+  const l = lab(), pr = progress(l.slug), n = nextTask(l.slug), ph = currentPhase(l.slug);
+  const pct = Math.round(pr.done/pr.total*100);
+  return `
+  <div class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <span class="overline" style="color:var(--cyan)">${esc(l.line)} · ${esc(l.tier)} onboarding</span>
+        <h1 style="margin-top:10px">${esc(l.name)}</h1>
+        <p class="sub">You're in <b style="color:#fff">Phase ${ph.order} — ${esc(ph.name)}</b>. ${esc(ph.blurb)}</p>
+        <div class="progress-wrap">
+          <div class="progress-line">
+            <span class="overline" style="color:rgba(255,255,255,.6)">Overall progress</span>
+            <span class="progress-count">${pr.done} of ${pr.total} done · ${pct}%</span>
+          </div>
+          <div class="bar"><span style="width:${pct}%"></span></div>
+        </div>
+      </div>
+      ${n?`<div class="nextcard">
+        <span class="overline">Next up for you</span>
+        <h3>${esc(n.title)}</h3>
+        <p>${esc(n.desc)}</p>
+        <a class="btn-coral" href="#task-${n.id}" onclick="openTask('${n.id}')">Open this task</a>
+      </div>`:`<div class="nextcard"><span class="overline">All clear</span><h3>Everything on your list is done</h3><p>Your account manager will confirm your go-live date.</p></div>`}
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="main">
+      <div class="sectionhead">
+        <div>
+          <h2>Your onboarding checklist</h2>
+          <p class="muted" style="font-size:14px;margin-top:4px">Shared with your Confident team — you both see and edit the same list.</p>
+        </div>
+        <button class="btn-ghost" onclick="openAdd('lab')">+ Add task or request help</button>
+      </div>
+      ${renderTasks(l.slug,'lab')}
+    </div>
+
+    <div class="rail">
+      <div class="card filled">
+        <span class="overline">Your onboarding manager</span>
+        <div class="am">
+          <div class="avatar">${initials(l.am)}</div>
+          <div>
+            <div class="am-name">${esc(l.am)}</div>
+            <div class="muted" style="font-size:13px">Account Manager</div>
+          </div>
+        </div>
+        <p class="contact"><a href="mailto:support@confidentlims.com">support@confidentlims.com</a><br><span class="muted" style="font-size:12.5px">Product and setup questions</span></p>
+        <p class="contact"><a href="mailto:ar@confidentlims.com">ar@confidentlims.com</a><br><span class="muted" style="font-size:12.5px">Billing and invoicing</span></p>
+      </div>
+
+      <div class="card">
+        <span class="overline">Your documents</span>
+        <div class="linklist">
+          ${docsFor(l).map(d=>`<a href="#" onclick="return false">${ICON.doc}<span>${esc(d.title)}<span class="slug">${esc(d.file)}</span></span></a>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="overline">Lab links</span>
+        <div class="linklist">
+          ${LAB_LINKS(l).map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener">${ICON.ext}<span>${esc(x.title)}<span class="slug">${esc(x.url)}</span></span></a>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="overline">Help articles</span>
+        <div class="linklist">
+          ${[HELP.login,HELP.analytes,HELP.panels,HELP.coa,HELP.importers,HELP.samples]
+            .map(h=>`<a href="${esc(h.url)}" target="_blank" rel="noopener">${ICON.help}<span>${esc(h.title)}</span></a>`).join('')}
+        </div>
+        <p style="margin-top:14px"><a href="https://help.confidentlims.com/for-labs" target="_blank" rel="noopener">Browse the full help center →</a></p>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- render: AM portfolio (outline §5.6) ---------- */
+function renderAmPortfolio(){
+  const scoped = STATE.amScope==='mine' ? LABS.filter(l=>l.am===STATE.currentUser) : LABS;
+  const rows = scoped.map(l=>{
+    const pr = progress(l.slug), n = nextTask(l.slug), ph = currentPhase(l.slug);
+    const d = daysIn(l);
+    const late = tasksFor(l.slug).filter(overdue).length;
+    return {l, pr, n, ph, d, late, stalled: late>0 || d>75};
+  });
+  /* v2 splits the portfolio in two. A lab with no next task has nothing left to chase,
+     so keeping it in the main table pads the list with rows that need no attention and
+     drags every count with it. Completed labs move to their own section below, and the
+     stats above describe only the labs still in flight. */
+  const active   = rows.filter(r => r.n);
+  const complete = rows.filter(r => !r.n);
+  const blockedOnLab = active.filter(r=>r.n.ownerSide==='lab').length;
+  const blockedOnUs  = active.filter(r=>r.n.ownerSide==='confident').length;
+  const atRisk = active.filter(r=>r.stalled).length;
+
+  return `
+  <div class="sectionhead">
+    <div>
+      <h1>Onboarding portfolio</h1>
+      <p class="muted" style="font-size:14.5px;margin-top:6px">Every lab currently in onboarding, and what each one is waiting on.</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="switcher" style="background:var(--gray)">
+        <button style="color:${STATE.amScope==='mine'?'var(--purple)':'rgba(28,23,57,.55)'}" aria-pressed="${STATE.amScope==='mine'}" onclick="setScope('mine')">My labs</button>
+        <button style="color:${STATE.amScope==='all'?'var(--purple)':'rgba(28,23,57,.55)'}" aria-pressed="${STATE.amScope==='all'}" onclick="setScope('all')">All labs</button>
+      </div>
+      <button class="btn-ghost" onclick="openTemplates()">Templates</button>
+      <button class="btn-blue" onclick="openNewLab()">+ New lab</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">${active.length}</div><span class="overline">Labs in onboarding</span></div>
+    <div class="stat"><div class="n">${blockedOnLab}</div><span class="overline">Waiting on the lab</span></div>
+    <div class="stat"><div class="n">${blockedOnUs}</div><span class="overline">Waiting on us</span></div>
+    <div class="stat ${atRisk?'alert':''}"><div class="n">${atRisk}</div><span class="overline">Overdue or stalled</span></div>
+    <div class="stat"><div class="n">${complete.length}</div><span class="overline">Completed</span></div>
+  </div>
+
+  <div class="cols">
+    <div class="main">
+      <div class="tablewrap">
+        <table>
+          <thead><tr>
+            <th>Lab</th><th>Plan</th><th>Phase</th><th>Progress</th><th>Days</th><th>Waiting on</th><th>AM</th>
+          </tr></thead>
+          <tbody>
+          ${active.length ? active.map(r=>`<tr data-stalled="${r.stalled?1:0}" onclick="openAmLab('${r.l.slug}')">
+            <td><span class="labname">${esc(r.l.name)}</span></td>
+            <td><span class="tier">${esc(r.l.line)}<br>${esc(r.l.tier)}</span></td>
+            <td><span class="phase-badge">P${r.ph.order} ${esc(r.ph.name)}</span></td>
+            <td><div class="minibar"><div class="bar"><span style="width:${Math.round(r.pr.done/r.pr.total*100)}%"></span></div><span class="n">${r.pr.done}/${r.pr.total}</span></div></td>
+            <td><span class="days ${r.d>75?'over':''}">${r.d}d</span></td>
+            <td>${(r.n.ownerSide==='lab' ? '<span class="chip chip-lab">Lab</span>' : '<span class="chip chip-conf">Us</span>')
+                  + (r.late?` <span class="chip chip-late">${r.late} overdue</span>`:'')}</td>
+            <td class="muted" style="font-size:13px">${esc(r.l.am)}</td>
+          </tr>`).join('')
+          : `<tr><td colspan="7"><span class="emptyhint">No labs in onboarding${STATE.amScope==='mine'?' assigned to you':''} right now.</span></td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="font-size:13px;margin-top:14px">Select a lab to open its shared checklist. You have read access to every lab; write access is limited to your assigned labs, and writes on unassigned labs are logged.</p>
+
+      <div class="sectionhead" style="margin-top:38px">
+        <div>
+          <h2 style="font-size:20px">Completed labs</h2>
+          <p class="muted" style="font-size:13.5px;margin-top:4px">Every checklist item signed off. Still open for reference.</p>
+        </div>
+      </div>
+      ${complete.length ? `<div class="tablewrap">
+        <table class="donetable">
+          <thead><tr>
+            <th>Lab</th><th>Plan</th><th>Progress</th><th>Onboarding took</th><th>Status</th><th>AM</th>
+          </tr></thead>
+          <tbody>
+          ${complete.map(r=>`<tr onclick="openAmLab('${r.l.slug}')">
+            <td><span class="labname">${esc(r.l.name)}</span></td>
+            <td><span class="tier">${esc(r.l.line)}<br>${esc(r.l.tier)}</span></td>
+            <td><div class="minibar"><div class="bar"><span style="width:100%"></span></div><span class="n">${r.pr.done}/${r.pr.total}</span></div></td>
+            <td><span class="days">${r.d}d</span></td>
+            <td><span class="chip chip-src">Complete</span></td>
+            <td class="muted" style="font-size:13px">${esc(r.l.am)}</td>
+          </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>` : `<span class="emptyhint">No labs have finished onboarding${STATE.amScope==='mine'?' under you':''} yet.</span>`}
+    </div>
+
+    <div class="rail">
+      <div class="card">
+        <span class="overline">Recent activity</span>
+        <div class="feed">
+          ${ACTIVITY.map(a=>`<div class="feed-item">
+            <span class="dot ${a.kind==='stall'?'coral':a.kind==='created'?'blue':''}"></span>
+            <span class="feed-txt">${a.txt}<br><span class="muted" style="font-size:12px">${esc(a.lab)}</span></span>
+            <span class="feed-when">${esc(a.when)}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card filled">
+        <span class="overline">Slack notifications</span>
+        <p class="muted" style="font-size:13px;margin-bottom:14px">Preview of what gets posted to <span class="mono">#lab-onboarding</span>. Batched into a digest so the channel stays readable.</p>
+        <div class="slackmsg">
+          <span class="chan">#lab-onboarding · Confident Onboarding</span>
+          <b>Onboarding digest — Sept 8</b>
+          <div class="row">Sky Analytics completed <b>Provide your client-facing pricing sheet</b> (8/21)</div>
+          <div class="row">PhytoLab MN raised a request: <b>Can we report two matrices on one COA?</b></div>
+          <div class="row">Montana Analytical entered <b>Validation &amp; Go-Live</b></div>
+          <div class="row">⚠ ChRi Laboratories — no activity for 9 days</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- render: AM lab detail ---------- */
+function renderAmLab(){
+  const l = LABS.find(x=>x.slug===STATE.amLab);
+  const pr = progress(l.slug), n = nextTask(l.slug), ph = currentPhase(l.slug);
+  const mineToWrite = l.am === STATE.currentUser;
+  return `
+  <button class="backlink" onclick="STATE.amLab=null;render()">${ICON.back} Back to portfolio</button>
+  <div class="sectionhead">
+    <div>
+      <span class="overline">${esc(l.line)} · ${esc(l.tier)} · started ${esc(l.start)} · ${daysIn(l)} days in</span>
+      <h1 style="margin-top:8px">${esc(l.name)}</h1>
+      <p class="muted" style="font-size:14.5px;margin-top:6px">
+        Phase ${ph.order} — ${esc(ph.name)} · ${pr.done}/${pr.total} complete ·
+        ${n ? 'waiting on <b>'+(n.ownerSide==='lab'?'the lab':'us')+'</b> for “'+esc(n.title)+'”' : 'checklist complete'}
+      </p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-ghost" onclick="openLabSettings('${l.slug}')">Lab settings</button>
+      <button class="btn-ghost" onclick="openAdd('am')">+ Add task</button>
+    </div>
+  </div>
+  ${mineToWrite ? '' : `<div class="note">You are not the assigned AM for this lab (${esc(l.am)} is). You have read access; any change you make here is recorded in the activity log.</div>`}
+  <div class="cols">
+    <div class="main">${renderTasks(l.slug,'am')}</div>
+    <div class="rail">
+      <div class="card filled">
+        <span class="overline">Assigned account manager</span>
+        <div class="am"><div class="avatar">${initials(l.am)}</div><div><div class="am-name">${esc(l.am)}</div><div class="muted" style="font-size:13px">Account Manager</div></div></div>
+      </div>
+      <div class="card">
+        <span class="overline">Internal notes</span>
+        <p class="muted" style="font-size:12.5px;margin-bottom:10px">Only account managers see this. The lab never does.</p>
+        <textarea class="notesbox" id="notes-${l.slug}" placeholder="Context for whoever picks this account up next…"
+          oninput="markNotesDirty('${l.slug}')">${esc(l.internalNotes)}</textarea>
+        <button class="btn-ghost" style="margin-top:10px" onclick="saveNotes('${l.slug}')">Save notes</button>
+        <span class="savedflag" id="notesflag-${l.slug}">${l.internalNotes ? 'Saved.' : 'Nothing saved yet.'}</span>
+      </div>
+      <div class="card">
+        <span class="overline">Document bundle</span>
+        <p class="muted" style="font-size:12.5px;margin-bottom:10px">${l.docBundle.length
+          ? 'Set for this lab in Lab settings.'
+          : 'Not set — showing the documents this plan implies. Add a bundle in Lab settings to override.'}</p>
+        <div class="linklist">${docsFor(l).map(d=>`<a href="#" onclick="return false">${ICON.doc}<span>${esc(d.title)}</span></a>`).join('')}</div>
+      </div>
+      <div class="card">
+        <span class="overline">Lab links</span>
+        <div class="linklist">${LAB_LINKS(l).map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener">${ICON.ext}<span>${esc(x.title)}<span class="slug">${esc(x.url)}</span></span></a>`).join('')}</div>
+      </div>
+      <div class="card">
+        <span class="overline">Linked records</span>
+        <p style="font-size:13.5px"><a href="#" onclick="return false">HubSpot onboarding ticket →</a><span class="slug">Stored as an ID; link-out only in v1.</span></p>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- interactions ---------- */
+/* render() repaints in place and holds the scroll position, because ticking a
+   task off mid-list should not throw you back to the top. Navigation — a role
+   change, a scope change, opening a lab — passes {top:true} on purpose. */
+function render(opts){
+  const y = window.scrollY;
+  const el = document.getElementById('app');
+  el.innerHTML = STATE.role==='lab' ? renderLab() : (STATE.amLab ? renderAmLab() : renderAmPortfolio());
+  window.scrollTo({top: (opts && opts.top) ? 0 : y});
+  saveState();
+}
+function setRole(r){
+  STATE.role = r; STATE.amLab = null;
+  document.getElementById('btnLab').setAttribute('aria-pressed', r==='lab');
+  document.getElementById('btnAm').setAttribute('aria-pressed', r==='am');
+  render({top:true});
+}
+function setScope(s){ STATE.amScope = s; render({top:true}); }
+function openAmLab(slug){ STATE.amLab = slug; render({top:true}); }
+
+function findTask(id){
+  for(const s in TASKS){ const t = TASKS[s].find(x=>x.id===id); if(t) return {t, slug:s}; }
+}
+function toggle(id){
+  const {t} = findTask(id);
+  if(isDone(t)){ t.status='Not started'; t.completedAt=null; }
+  else { t.status='Done'; t.completedAt=TODAY.toISOString().slice(0,10); }
+  const open = document.querySelector('.task[data-open="1"]');
+  const openId = open ? open.id : null;
+  render();
+  if(openId){ const e = document.getElementById(openId); if(e) e.setAttribute('data-open','1'); }
+}
+function openTask(id){
+  const e = document.getElementById('task-'+id);
+  if(!e) return false;
+  const was = e.getAttribute('data-open')==='1';
+  document.querySelectorAll('.task[data-open="1"]').forEach(x=>x.removeAttribute('data-open'));
+  if(!was) e.setAttribute('data-open','1');
+  return false;
+}
+function addComment(ev,id){
+  ev.preventDefault();
+  const input = ev.target.querySelector('input');
+  const v = input.value.trim(); if(!v) return;
+  const {t} = findTask(id);
+  t.comments.push({
+    who: STATE.role==='lab' ? 'You ('+lab().name+')' : STATE.currentUser,
+    role: STATE.role==='lab' ? 'lab' : 'confident', when:'just now', txt:v
+  });
+  render();
+  const e = document.getElementById('task-'+id); if(e) e.setAttribute('data-open','1');
+}
+
+function openAdd(mode){
+  const slug = mode==='lab' ? STATE.labSlug : STATE.amLab;
+  const l = LABS.find(x=>x.slug===slug);
+  document.getElementById('modal').innerHTML = `
+    <h2>${mode==='lab' ? 'Add a task or request help' : 'Add a task for '+esc(l.name)}</h2>
+    <p>${mode==='lab'
+        ? 'Add something to your own list, or raise a request for the Confident team. Either way it becomes tracked work instead of a message that scrolls away.'
+        : 'Assign this to the lab or to yourself. The lab sees it on their checklist immediately.'}</p>
+    <form onsubmit="submitAdd(event,'${mode}','${slug}')">
+      <div class="field">
+        <label class="overline">Task title</label>
+        <input name="title" required placeholder="${mode==='lab'?'e.g. Send updated pricing sheet':'e.g. Provide second matrix sample'}">
+      </div>
+      <div class="field">
+        <label class="overline">Details</label>
+        <textarea name="desc" placeholder="What needs to happen, and anything the other side needs to know."></textarea>
+      </div>
+      <div class="field">
+        <label class="overline">Phase</label>
+        <select name="phase">${phasesFor(l).map(p=>`<option value="${p.id}">Phase ${p.order} — ${esc(p.name)}</option>`).join('')}</select>
+      </div>
+      <div class="field">
+        <label class="overline">Who owns it</label>
+        <select name="side">
+          ${mode==='lab'
+            ? '<option value="lab">Our lab</option><option value="confident">Confident (this is a request for help)</option>'
+            : '<option value="lab">The lab</option><option value="confident">Us (Confident)</option>'}
+        </select>
+      </div>
+      <div class="field">
+        <label class="overline">Due date</label>
+        <input type="date" name="due" value="2026-09-15">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-blue">Add task</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+function closeModal(){ document.getElementById('scrim').removeAttribute('data-open'); }
+function submitAdd(ev,mode,slug){
+  ev.preventDefault();
+  /* Read through form.elements rather than form.<name>. The bare-name form
+     only works because of a legacy rule that lets named controls shadow real
+     DOM properties — otherwise f.title would be the title *attribute*, not the
+     input. Explicit is safer, and it is what makes this testable. */
+  const f = ev.target.elements, l = LABS.find(x=>x.slug===slug);
+  const side = f.side.value;
+  TASKS[slug].push({
+    id:'t'+(++TASK_ID),
+    title:f.title.value.trim(),
+    desc:f.desc.value.trim() || 'No further detail provided.',
+    phase:f.phase.value, ownerSide:side,
+    assignee: side==='lab' ? l.name+' team' : l.am,
+    status:'Not started', dueDate:f.due.value || '2026-09-15', completedAt:null,
+    source: mode==='lab' ? 'lab-created' : 'am-created',
+    createdBy: mode==='lab' ? 'You ('+l.name+')' : STATE.currentUser+' (Account Manager)',
+    order:100+TASKS[slug].length, help:[], docs:[], comments:[]
+  });
+  ACTIVITY.unshift({
+    kind:'created', lab:l.name,
+    txt:`<b>${esc(mode==='lab' ? 'You' : STATE.currentUser)}</b> added “${esc(f.title.value.trim())}”`,
+    when:'just now'
+  });
+  closeModal(); render();
+}
+
+/* ---------- v2: user settings ---------- */
+/* The demo can be viewed from either side, so settings edit whichever identity is
+   currently active rather than a single global "you". */
+function openUserSettings(){
+  const me = meNow(), side = STATE.role;
+  document.getElementById('modal').innerHTML = `
+    <h2>Your settings</h2>
+    <p>You are viewing the portal as ${side==='lab' ? 'a lab user' : 'an account manager'}. Changing your name here changes it everywhere you appear — on tasks you own, in activity, and in the assignment dropdowns.</p>
+    <form onsubmit="submitUserSettings(event,'${side}')">
+      <div class="field">
+        <label class="overline">Your name</label>
+        <input name="name" required value="${esc(me.name)}">
+      </div>
+      <div class="field">
+        <label class="overline">Your role</label>
+        <input name="role" required value="${esc(me.role)}" placeholder="e.g. Lab Director">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-blue">Save settings</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+function submitUserSettings(ev, side){
+  ev.preventDefault();
+  const f = ev.target.elements;
+  const name = f.name.value.trim(), role = f.role.value.trim();
+  if(!name || !role) return;
+  const was = STATE.me[side].name;
+  STATE.me[side] = {name, role};
+
+  if(side === 'am'){
+    /* The My-labs filter matches on STATE.currentUser, so renaming the account manager
+       without carrying the rename onto their labs would empty their own portfolio.
+       Move both together, and take their existing assignments with them. */
+    STATE.currentUser = name;
+    LABS.forEach(l => { if(l.am === was) l.am = name; });
+    for(const s in TASKS) TASKS[s].forEach(t => { if(t.assignee === was) t.assignee = name; });
+  } else {
+    /* A lab user is a name on lab.users, so rename them there and on anything they hold. */
+    LABS.forEach(l => {
+      if(!Array.isArray(l.users)) return;
+      const i = l.users.indexOf(was);
+      if(i > -1) l.users[i] = name;
+    });
+    for(const s in TASKS) TASKS[s].forEach(t => { if(t.assignee === was) t.assignee = name; });
+  }
+  closeModal(); render();
+}
+
+/* ---------- v2: internal notes (account manager only) ---------- */
+/* The notes box deliberately does not re-render on save. Re-rendering would blow away
+   the textarea the user is typing in, so the flag beside the button is updated in place
+   and saveState is called directly — render() would normally have done that for us. */
+function markNotesDirty(slug){
+  const f = document.getElementById('notesflag-'+slug);
+  if(f) f.textContent = 'Unsaved changes.';
+}
+function saveNotes(slug){
+  const box = document.getElementById('notes-'+slug);
+  const l = LABS.find(x=>x.slug===slug);
+  if(!box || !l) return;
+  l.internalNotes = box.value.trim();
+  saveState();
+  const f = document.getElementById('notesflag-'+slug);
+  if(f) f.textContent = l.internalNotes ? 'Saved.' : 'Nothing saved yet.';
+}
+
+/* ---------- v2: create a new lab ---------- */
+const slugify = s => s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+/* Instantiating a phase template mirrors buildTasks: same due-date spacing off the
+   start date, and the template's help/docs are KEYS that have to be mapped through
+   HELP/DOCS to become the objects the renderer expects. A blank template gives [] —
+   a lab with no tasks yet, which the empty states already handle. */
+function tasksFromTemplate(lab, ptmpl){
+  if(!ptmpl) return [];
+  const picked = ptmpl.taskIds
+    .map(id => TASK_TEMPLATES.find(t => t.id === id))
+    .filter(Boolean)
+    .sort((a,b) => PHASES.findIndex(p=>p.id===a.phase) - PHASES.findIndex(p=>p.id===b.phase));
+  const startMs = new Date(lab.start+'T12:00:00Z').getTime();
+  return picked.map((tt,i)=>({
+    id:'t'+(++TASK_ID),
+    title:tt.title, desc:tt.desc, phase:tt.phase, ownerSide:tt.side,
+    assignee: tt.side==='lab' ? lab.name+' team' : lab.am,
+    status:'Not started',
+    dueDate: new Date(startMs + (i+1)*4*864e5).toISOString().slice(0,10),
+    completedAt:null,
+    source:'template', createdBy:'Phase template ('+ptmpl.name+')',
+    order:i, help:(tt.help||[]).map(k=>HELP[k]).filter(Boolean),
+    docs:(tt.docs||[]).map(k=>DOCS[k]).filter(Boolean),
+    comments:[]
+  }));
+}
+
+/* Picking a product and plan should land on the matching phase template without the
+   account manager having to know the template names. They can still override it. */
+function syncTemplatePick(form){
+  const f = form.elements;
+  const match = PHASE_TEMPLATES.find(p => p.line===f.line.value && p.tier===f.tier.value);
+  f.tmpl.value = match ? match.id : '';
+}
+function syncSlug(form){
+  const f = form.elements;
+  /* Only track the name while the slug is still untouched, so a hand-edited slug sticks. */
+  if(f.slug.dataset.touched) return;
+  f.slug.value = slugify(f.name.value);
+}
+
+function openNewLab(){
+  const tiers = ['Starter','Pro','Premium','Basic'];
+  document.getElementById('modal').innerHTML = `
+    <h2>Create a new lab</h2>
+    <p>This sets up the onboarding record. Picking a starting template fills the checklist;
+       choose blank if you would rather build it by hand.</p>
+    <form onsubmit="submitNewLab(event)" class="modal-wide">
+      <div class="modal-scroll">
+        <div class="field-row">
+          <div class="field">
+            <label class="overline">Lab name</label>
+            <input name="name" required placeholder="Cascade Analytical" oninput="syncSlug(this.form)">
+          </div>
+          <div class="field">
+            <label class="overline">Abbreviation</label>
+            <input name="abbrev" maxlength="5" placeholder="CAS">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="overline">State</label>
+            <input name="state" maxlength="2" placeholder="OR">
+          </div>
+          <div class="field">
+            <label class="overline">Lab slug</label>
+            <input name="slug" required placeholder="cascade-analytical"
+              oninput="this.dataset.touched='1'">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="overline">Product</label>
+            <select name="line" onchange="syncTemplatePick(this.form)">
+              <option value="LIMS">LIMS</option>
+              <option value="Network Only">Network Only</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="overline">Plan</label>
+            <select name="tier" onchange="syncTemplatePick(this.form)">
+              ${tiers.map(t=>`<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="overline">Starting template</label>
+          <select name="tmpl">
+            <option value="">Blank — no tasks yet</option>
+            ${PHASE_TEMPLATES.map(p=>`<option value="${p.id}">${esc(p.name)} — ${p.taskIds.length} tasks</option>`).join('')}
+          </select>
+        </div>
+        <span class="savedflag" id="newlaberr"></span>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-blue">Create lab</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+  syncTemplatePick(document.getElementById('modal').querySelector('form'));
+}
+
+function submitNewLab(ev){
+  ev.preventDefault();
+  const f = ev.target.elements;
+  const slug = slugify(f.slug.value) || slugify(f.name.value);
+  const err = document.getElementById('newlaberr');
+  if(LABS.some(l => l.slug === slug)){
+    if(err) err.textContent = 'That slug is already taken by ' + LABS.find(l=>l.slug===slug).name + '.';
+    return;
+  }
+  const lab = normalizeLab({
+    slug, name:f.name.value.trim(),
+    abbrev:f.abbrev.value.trim().toUpperCase(),
+    state:f.state.value.trim().toUpperCase(),
+    line:f.line.value, tier:f.tier.value,
+    am: STATE.me.am.name,
+    start: TODAY.toISOString().slice(0,10),
+    done:0, users:[]
+  });
+  LABS.push(lab);
+  TASKS[slug] = tasksFromTemplate(lab, PHASE_TEMPLATES.find(p=>p.id===f.tmpl.value));
+  ACTIVITY.unshift({kind:'created', lab:lab.name,
+    txt:`<b>${esc(STATE.me.am.name)}</b> created ${esc(lab.name)}`, when:'just now'});
+  closeModal();
+  STATE.amLab = slug;
+  render({top:true});
+}
+
+/* ---------- v2: per-lab settings ---------- */
+function addUserRow(){
+  const box = document.getElementById('userrows');
+  if(!box) return;
+  const row = document.createElement('div');
+  row.className = 'rowitem';
+  row.innerHTML = `<input name="user" placeholder="Name" value="">
+    <button type="button" class="xbtn" onclick="this.parentNode.remove()" aria-label="Remove">&times;</button>`;
+  box.appendChild(row);
+  const input = row.querySelector('input');
+  if(input) input.focus();
+}
+
+function openLabSettings(slug){
+  const l = LABS.find(x=>x.slug===slug);
+  if(!l) return;
+  document.getElementById('modal').innerHTML = `
+    <h2>Lab settings — ${esc(l.name)}</h2>
+    <p>Everything here is set for this lab only. Leave a phase name blank to keep the default.</p>
+    <form onsubmit="submitLabSettings(event,'${slug}')" class="modal-wide">
+      <div class="modal-scroll">
+        <span class="subhead first">Phase names</span>
+        ${PHASES.map(p=>`
+          <div class="field">
+            <label class="overline">Phase ${p.order}</label>
+            <input name="phase-${p.id}" placeholder="${esc(p.name)}" value="${esc(l.phaseNames[p.id]||'')}">
+          </div>`).join('')}
+
+        <span class="subhead">Document bundle</span>
+        <p class="muted" style="font-size:12.5px;margin:-4px 0 10px">
+          Tick nothing and the lab sees the documents its plan implies. Tick anything and that becomes the bundle.</p>
+        ${ALL_DOCS().map(d=>`
+          <label class="rowitem" style="cursor:pointer">
+            <input type="checkbox" name="doc" value="${d.key}" ${l.docBundle.includes(d.key)?'checked':''}
+              style="width:auto;flex:0 0 auto">
+            <span style="flex:1">${esc(d.title)}</span>
+          </label>`).join('')}
+
+        <span class="subhead">Lab users</span>
+        <p class="muted" style="font-size:12.5px;margin:-4px 0 10px">
+          Names listed here can be picked as the assignee on any lab-owned task.</p>
+        <div id="userrows">
+          ${(l.users||[]).map(u=>`
+            <div class="rowitem">
+              <input name="user" value="${esc(u)}" placeholder="Name">
+              <button type="button" class="xbtn" onclick="this.parentNode.remove()" aria-label="Remove">&times;</button>
+            </div>`).join('')}
+        </div>
+        <button type="button" class="btn-ghost" style="margin-top:8px" onclick="addUserRow()">+ Add user</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-blue">Save settings</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+
+function submitLabSettings(ev, slug){
+  ev.preventDefault();
+  const l = LABS.find(x=>x.slug===slug);
+  if(!l) return;
+  const f = ev.target.elements;
+
+  /* Blank means "use the default", so drop the key rather than storing an empty string —
+     phasesFor only overrides on a truthy value and this keeps the saved state honest. */
+  const names = {};
+  PHASES.forEach(p => {
+    const v = (f['phase-'+p.id].value || '').trim();
+    if(v && v !== p.name) names[p.id] = v;
+  });
+  l.phaseNames = names;
+
+  /* Repeated same-named inputs come back as a RadioNodeList, a bare element, or nothing
+     at all depending on how many there are. querySelectorAll is the same shape every time. */
+  l.docBundle = [...ev.target.querySelectorAll('input[name="doc"]:checked')].map(i=>i.value);
+
+  const before = (l.users||[]).slice();
+  l.users = [...ev.target.querySelectorAll('input[name="user"]')]
+    .map(i=>i.value.trim()).filter(Boolean)
+    .filter((v,i,a)=>a.indexOf(v)===i);
+
+  /* A removed user may still be holding tasks. Hand those back to the lab rather than
+     leaving an assignee that no longer appears in any dropdown. */
+  const gone = before.filter(u => !l.users.includes(u));
+  if(gone.length){
+    (TASKS[slug]||[]).forEach(t => { if(gone.includes(t.assignee)) t.assignee = l.name+' team'; });
+  }
+
+  closeModal(); render();
+}
+
+/* ---------- v2: template admin ----------
+   Two stores, deliberately separate. A task template is one reusable piece of work and
+   knows nothing about who gets it. A phase template is the answer to "what does a
+   Network Only Basic lab actually have to do", so it names phases and picks task
+   templates. New labs are built by pairing the two. Modals are not part of render(),
+   so anything that mutates here saves and re-opens the list itself. */
+function openTemplates(){
+  const byPhase = p => TASK_TEMPLATES.filter(t => t.phase === p.id);
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-wide">
+      <h3>Templates</h3>
+      <p class="muted" style="font-size:13px;margin-bottom:4px">
+        Phase templates decide what a new lab starts with. Task templates are the pieces they draw from.
+      </p>
+      <div class="modal-scroll">
+        <div class="subhead first">Phase templates</div>
+        ${PHASE_TEMPLATES.map(p => {
+          const renames = Object.keys(p.phaseNames || {}).length;
+          return `<div class="tmplcard">
+            <div>
+              <b>${esc(p.name)}</b>
+              <div class="muted" style="font-size:12px">
+                ${esc(p.line)} · ${esc(p.tier)} · ${p.taskIds.length} task${p.taskIds.length===1?'':'s'}${renames ? ' · renames '+renames+' phase'+(renames===1?'':'s') : ''}
+              </div>
+            </div>
+            <button class="btn-ghost" onclick="openPhaseTemplate('${p.id}')">Edit</button>
+          </div>`;
+        }).join('')}
+        <button class="btn-ghost" style="margin-top:8px" onclick="openPhaseTemplate('')">+ New phase template</button>
+
+        <div class="subhead">Task templates</div>
+        ${PHASES.map(p => `
+          <div class="overline" style="margin:14px 0 6px">${esc(p.name)}</div>
+          ${byPhase(p).length ? byPhase(p).map(t => `
+            <div class="tmplcard">
+              <div>
+                <b>${esc(t.title)}</b>
+                <div class="muted" style="font-size:12px">
+                  ${t.side === 'lab' ? 'Lab' : 'Confident'}${t.builtin ? ' · built in' : ''}
+                </div>
+              </div>
+              <button class="btn-ghost" onclick="openTaskTemplate('${t.id}')">Edit</button>
+            </div>`).join('')
+            : '<div class="emptyhint">No task templates in this phase yet.</div>'}
+        `).join('')}
+        <button class="btn-ghost" style="margin-top:12px" onclick="openTaskTemplate('')">+ New task template</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-blue" onclick="closeModal()">Done</button>
+      </div>
+    </div>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+
+function openTaskTemplate(id){
+  const t = TASK_TEMPLATES.find(x => x.id === id);
+  document.getElementById('modal').innerHTML = `
+    <form onsubmit="submitTaskTemplate(event, '${id}')">
+      <h3>${t ? 'Edit task template' : 'New task template'}</h3>
+      <div class="field">
+        <label class="overline" for="tt-title">Title</label>
+        <input id="tt-title" name="title" required value="${t ? esc(t.title) : ''}" placeholder="Upload your method list">
+      </div>
+      <div class="field">
+        <label class="overline" for="tt-desc">What this asks for</label>
+        <textarea id="tt-desc" name="desc" rows="3" placeholder="One or two sentences the lab will actually read.">${t ? esc(t.desc) : ''}</textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="overline" for="tt-phase">Phase</label>
+          <select id="tt-phase" name="phase">
+            ${PHASES.map(p => `<option value="${p.id}" ${t && t.phase===p.id ? 'selected':''}>${esc(p.name)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label class="overline" for="tt-side">Owner</label>
+          <select id="tt-side" name="side">
+            <option value="lab" ${t && t.side==='lab' ? 'selected':''}>Lab</option>
+            <option value="confident" ${t && t.side==='confident' ? 'selected':''}>Confident</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        ${t ? `<button type="button" class="btn-ghost" style="color:var(--coral)" onclick="deleteTaskTemplate('${t.id}')">Delete this template</button>` : ''}
+        <button type="button" class="btn-ghost" onclick="openTemplates()">Back</button>
+        <button type="submit" class="btn-blue">${t ? 'Save' : 'Create'}</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+
+function submitTaskTemplate(ev, id){
+  ev.preventDefault();
+  const f = ev.target.elements;
+  const patch = {
+    title:f.title.value.trim(), desc:f.desc.value.trim(),
+    phase:f.phase.value, side:f.side.value
+  };
+  const existing = TASK_TEMPLATES.find(x => x.id === id);
+  if(existing) Object.assign(existing, patch);
+  else TASK_TEMPLATES.push({id:'tt'+(++TMPL_ID), help:[], docs:[], builtin:false, ...patch});
+  saveState();
+  openTemplates();
+}
+
+function deleteTaskTemplate(id){
+  const i = TASK_TEMPLATES.findIndex(x => x.id === id);
+  if(i < 0) return;
+  TASK_TEMPLATES.splice(i,1);
+  /* A phase template still holding this id would silently build one task short with no
+     clue why, so drop the reference everywhere it appears. */
+  PHASE_TEMPLATES.forEach(p => { p.taskIds = p.taskIds.filter(x => x !== id); });
+  saveState();
+  openTemplates();
+}
+
+function openPhaseTemplate(id){
+  const p = PHASE_TEMPLATES.find(x => x.id === id);
+  const picked = p ? p.taskIds : [];
+  const over = (p && p.phaseNames) || {};
+  document.getElementById('modal').innerHTML = `
+    <form class="modal-wide" onsubmit="submitPhaseTemplate(event, '${id}')">
+      <h3>${p ? 'Edit phase template' : 'New phase template'}</h3>
+      <div class="modal-scroll">
+        <div class="field">
+          <label class="overline" for="pt-name">Template name</label>
+          <input id="pt-name" name="name" required value="${p ? esc(p.name) : ''}" placeholder="LIMS — Pro">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="overline" for="pt-line">Product</label>
+            <select id="pt-line" name="line">
+              <option value="LIMS" ${p && p.line==='LIMS' ? 'selected':''}>LIMS</option>
+              <option value="Network Only" ${p && p.line==='Network Only' ? 'selected':''}>Network Only</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="overline" for="pt-tier">Plan</label>
+            <select id="pt-tier" name="tier">
+              ${['Starter','Pro','Premium','Basic'].map(x =>
+                `<option value="${x}" ${p && p.tier===x ? 'selected':''}>${x}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <div class="subhead">Phase names</div>
+        <p class="muted" style="font-size:12.5px;margin-bottom:10px">Leave blank to use the default.</p>
+        ${PHASES.map(ph => `
+          <div class="field">
+            <label class="overline" for="pt-${ph.id}">${esc(ph.name)}</label>
+            <input id="pt-${ph.id}" name="phase-${ph.id}" value="${esc(over[ph.id] || '')}" placeholder="${esc(ph.name)}">
+          </div>`).join('')}
+
+        <div class="subhead">Tasks in this template</div>
+        ${PHASES.map(ph => {
+          const rows = TASK_TEMPLATES.filter(t => t.phase === ph.id);
+          return `<div class="overline" style="margin:14px 0 6px">${esc(ph.name)}</div>
+          ${rows.length ? rows.map(t => `
+            <label class="rowitem">
+              <input type="checkbox" name="task" value="${t.id}" ${picked.includes(t.id) ? 'checked':''}>
+              <span>${esc(t.title)} <span class="muted">· ${t.side === 'lab' ? 'Lab' : 'Confident'}</span></span>
+            </label>`).join('')
+            : '<div class="emptyhint">No task templates in this phase yet.</div>'}`;
+        }).join('')}
+      </div>
+      <div class="modal-actions">
+        ${p ? `<button type="button" class="btn-ghost" style="color:var(--coral)" onclick="deletePhaseTemplate('${p.id}')">Delete this template</button>` : ''}
+        <button type="button" class="btn-ghost" onclick="openTemplates()">Back</button>
+        <button type="submit" class="btn-blue">${p ? 'Save' : 'Create'}</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+
+function submitPhaseTemplate(ev, id){
+  ev.preventDefault();
+  const f = ev.target.elements;
+  const names = {};
+  PHASES.forEach(ph => {
+    const v = (f['phase-'+ph.id].value || '').trim();
+    if(v && v !== ph.name) names[ph.id] = v;
+  });
+  const patch = {
+    name:f.name.value.trim(), line:f.line.value, tier:f.tier.value,
+    phaseNames:names,
+    taskIds:[...ev.target.querySelectorAll('input[name="task"]:checked')].map(i => i.value)
+  };
+  const existing = PHASE_TEMPLATES.find(x => x.id === id);
+  if(existing) Object.assign(existing, patch);
+  else PHASE_TEMPLATES.push({id:'pt'+(++PTMPL_ID), ...patch});
+  saveState();
+  openTemplates();
+}
+
+function deletePhaseTemplate(id){
+  const i = PHASE_TEMPLATES.findIndex(x => x.id === id);
+  if(i < 0) return;
+  /* Safe to remove outright: building a lab copies tasks rather than linking to them,
+     so no existing lab points back at this template. */
+  PHASE_TEMPLATES.splice(i,1);
+  saveState();
+  openTemplates();
+}
+
+/* ---------- boot ---------- */
+loadState();
+document.getElementById('btnLab').setAttribute('aria-pressed', STATE.role==='lab');
+document.getElementById('btnAm').setAttribute('aria-pressed', STATE.role==='am');
+render({top:true});
+</script>
+</body>
+</html>
