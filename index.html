@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Confident Onboarding Portal — First Draft</title>
+<title>Confident Onboarding Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -227,21 +227,23 @@ input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
 .stat .n{font-size:32px;font-weight:700;color:var(--purple);line-height:1.1;letter-spacing:-.02em}
 .stat.alert .n{color:var(--coral)}
 .stat .overline{margin-top:6px;display:block}
-.tablewrap{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--white)}
+.tablewrap{border:1px solid var(--line);border-radius:var(--r-md);overflow-x:auto;background:var(--white)}
 table{width:100%;border-collapse:collapse}
 thead th{
   text-align:left;padding:13px 18px;background:var(--gray);border-bottom:1px solid var(--line);
   font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
   color:rgba(28,23,57,.58);white-space:nowrap;
 }
-tbody td{padding:15px 18px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+tbody td{padding:15px 12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+tbody td:first-child{vertical-align:top;padding-left:18px}
+tbody td:last-child{padding-right:18px}
 tbody tr:last-child td{border-bottom:0}
 tbody tr{cursor:pointer;transition:background .15s}
 tbody tr:hover{background:rgba(82,55,233,.03)}
 .labname{font-weight:600;color:var(--purple);font-size:14.5px}
 .tier{font-family:var(--mono);font-size:11px;color:rgba(28,23,57,.60)}
-.minibar{display:flex;align-items:center;gap:9px;min-width:120px}
-.minibar .bar{width:72px;background:rgba(28,23,57,.10)}
+.minibar{display:flex;align-items:center;gap:8px;min-width:0}
+.minibar .bar{width:54px;flex:0 0 auto;background:rgba(28,23,57,.10)}
 .minibar .bar>span{background:var(--blue)}
 .minibar .n{font-family:var(--mono);font-size:11.5px;color:rgba(28,23,57,.62);white-space:nowrap}
 tr[data-stalled="1"] .minibar .bar>span{background:var(--coral)}
@@ -251,6 +253,84 @@ tr[data-stalled="1"] .minibar .bar>span{background:var(--coral)}
   display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--blue);
 }
+
+/* ---------- v3 additions ---------- */
+.headbtns{display:flex;gap:10px;align-items:center}
+.headbtns .btn-ghost{text-decoration:none;display:inline-flex;align-items:center}
+
+/* Phase header now carries the date and the overdue state. */
+.phase-due{font-family:var(--mono);font-size:11px;color:rgba(28,23,57,.55);white-space:nowrap}
+.phase-due.late{color:var(--coral)}
+.phase[data-late="1"] .phase-badge{background:rgba(243,99,68,.12);color:var(--coral)}
+
+/* Delete control on a task row — low contrast until the row is hovered. */
+.task-del{
+  flex:0 0 auto;align-self:flex-start;margin-left:8px;
+  width:24px;height:24px;border:0;border-radius:6px;cursor:pointer;
+  background:transparent;color:rgba(28,23,57,.28);font-size:17px;line-height:1;
+  opacity:0;transition:opacity .12s,background .12s,color .12s;
+}
+.task:hover .task-del,.task-del:focus-visible{opacity:1}
+.task-del:hover{background:rgba(243,99,68,.12);color:var(--coral)}
+
+.chip-linear{background:rgba(82,55,233,.10);color:var(--blue)}
+.linearbox{margin-top:14px}
+.linearrow{display:flex;align-items:center;gap:8px;margin-top:6px}
+.linearrow a{display:inline-flex;align-items:center;gap:7px;font-size:13px;text-decoration:none}
+.linearrow a svg{width:13px;height:13px;flex:0 0 auto}
+.linearform{display:flex;gap:8px;margin-top:10px}
+.linearform input{flex:1;min-width:0}
+.helplink{font-size:13.5px}
+
+/* Portfolio: the status note is a second line under the lab name, where it is
+   readable at full row width rather than squeezed into a column of its own. */
+.statusnote{
+  display:block;margin-top:5px;font-size:12.5px;line-height:1.45;
+  color:rgba(28,23,57,.62);
+}
+/* The Lab cell holds the name, the Linear link and the status note, so it takes the
+   slack in the row. Without this the note wraps to one word per line. */
+tbody td:first-child{min-width:200px}
+.labname{display:inline}
+/* The phase badge is the widest thing in its column; let it wrap rather than force
+   the whole table wider than the main pane. */
+td .phase-badge{white-space:normal;display:inline-block;max-width:140px}
+/* Keep the overdue chip inside the cell: the phase name can be long, and the row is
+   already carrying a Lab/Us chip beside it. */
+/* Two short lines beat a truncated one: the phase name is the point of the chip. */
+td .chip-late{
+  display:block;margin-top:5px;max-width:185px;
+  white-space:normal;line-height:1.5;
+}
+.linearicon{display:inline-flex;margin-left:7px;color:var(--blue);vertical-align:middle}
+.linearicon svg{width:12px;height:12px}
+.tagrow{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{
+  display:inline-block;padding:2px 7px;border-radius:5px;
+  background:rgba(92,206,255,.16);color:#1b6a92;
+  font-size:10.5px;font-weight:600;letter-spacing:.02em;white-space:nowrap;
+}
+.tagpick{display:flex;flex-wrap:wrap;gap:8px}
+.tagopt{display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  padding:6px 10px;border:1px solid rgba(28,23,57,.14);border-radius:8px;font-size:12.5px}
+.tagopt input{width:auto;flex:0 0 auto;margin:0}
+.tagopt:has(input:checked){border-color:var(--blue);background:rgba(82,55,233,.06)}
+select.sentiment{font-size:12.5px;padding:5px 8px;max-width:170px}
+select.sentiment[data-v="rough"]{color:var(--coral)}
+
+/* Phase rows in the template editor. */
+.phrow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.phrow .phnum{
+  flex:0 0 auto;width:22px;height:22px;border-radius:6px;background:var(--gray);
+  font-family:var(--mono);font-size:11px;display:grid;place-items:center;color:rgba(28,23,57,.6);
+}
+.phrow input[data-k="name"]{flex:1;min-width:0}
+.offlab{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:rgba(28,23,57,.6);white-space:nowrap}
+.offlab input{width:62px;flex:0 0 auto}
+.xbtn[disabled]{opacity:.3;cursor:not-allowed}
+.taskrow{align-items:center;gap:10px}
+.taskpick{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer}
+.taskrow select{flex:0 0 auto;max-width:170px;font-size:12px;padding:5px 8px}
 
 /* ---------- activity + slack ---------- */
 .feed{display:flex;flex-direction:column;gap:0}
@@ -405,12 +485,23 @@ const TODAY = new Date('2026-09-08T12:00:00Z');
    These are the portal-wide defaults. v2 lets an account manager rename phases
    for one lab without touching the defaults, so nothing reads PHASES directly —
    every caller goes through phasesFor(lab), which layers lab.phaseNames on top. */
+/* v3: a phase carries dueOffset — days from the lab's start date. A phase template
+   owns an ordered copy of this list, and creating a lab snapshots the template's copy
+   onto the lab, so editing a template later never reshapes a live onboarding. */
 const PHASES = [
-  {id:'p1', order:1, name:'Kickoff & Access',      blurb:'Get everyone into the system and aligned on scope.'},
-  {id:'p2', order:2, name:'Lab Configuration',     blurb:'Tell us what you test and what you charge.'},
-  {id:'p3', order:3, name:'Data & Methods',        blurb:'Wire your instruments and compliance rules into Confident.'},
-  {id:'p4', order:4, name:'Validation & Go-Live',  blurb:'Prove it works on real samples, then switch over.'}
+  {id:'p1', order:1, name:'Kickoff & Access',      blurb:'Get everyone into the system and aligned on scope.',              dueOffset:14},
+  {id:'p2', order:2, name:'Lab Configuration',     blurb:'Tell us what you test and what you charge.',                      dueOffset:35},
+  {id:'p3', order:3, name:'Data & Methods',        blurb:'Wire your instruments and compliance rules into Confident.',      dueOffset:60},
+  {id:'p4', order:4, name:'Validation & Go-Live',  blurb:'Prove it works on real samples, then switch over.',               dueOffset:85}
 ];
+const clonePhases = () => PHASES.map(p => ({...p}));
+
+/* v3: the industry menu labs pick from. Rendered as chips beside the plan. */
+const INDUSTRIES = ['Cannabis','Hemp','Environmental','Food & Beverage','Agriculture','Pharmaceutical','Psychedelics','Consumer Products'];
+
+/* v3: handed to a lab once its checklist is finished. */
+const SURVEY_URL = 'https://www.confidentlims.com/onboarding-survey';
+const SUPPORT_EMAIL = 'support@confidentlims.com';
 
 /* ---------- Document (outline §4/§6) — real filenames from Notion ---------- */
 const DOCS = {
@@ -419,7 +510,9 @@ const DOCS = {
   planStarter: {id:'d-p1', title:'Starter Plan Overview',  file:'Confident_Starter_Plan.pdf',  tiers:['Starter']},
   planPro:     {id:'d-p2', title:'Pro Plan Overview',      file:'Confident_Pro_Plan.pdf',      tiers:['Pro']},
   planPremium: {id:'d-p3', title:'Premium Plan Overview',  file:'Confident_Premium_Plan.pdf',  tiers:['Premium']},
-  planBasic:   {id:'d-p4', title:'Basic Plan Overview',    file:'Confident_Basic_Plan.pdf',    tiers:['Basic']}
+  planBasic:   {id:'d-p4', title:'Basic Plan Overview',    file:'Confident_Basic_Plan.pdf',    tiers:['Basic']},
+  /* v3: the worked COA example a lab compares its own preferences against. */
+  coaExample:  {id:'d-coa',  title:'Confident COA Template — worked example', file:'Confident_COA_Template_Example.pdf', shared:true}
 };
 
 /* ---------- HelpArticle (outline §5.5) — curated help-center links ---------- */
@@ -449,7 +542,8 @@ const TEMPLATE_TASKS = [
   {t:'Provide your assay and test panel menu',             ph:'p2', side:'lab',       desc:'Which panels you sell, and which analytes belong to each. This drives ordering and COA layout.', help:['panels']},
   {t:'Provide your client-facing pricing sheet',           ph:'p2', side:'lab',       desc:'Per-panel and per-sample pricing, plus any rush or bundle pricing you want reflected in the order form.', help:['pricing']},
   {t:'Configure test panels in Confident',                 ph:'p2', side:'confident', desc:'We build your panels from the menu you sent and send back a preview for approval.', help:['panels']},
-  {t:'Confirm your COA template preferences',              ph:'p2', side:'lab',       desc:'Logo, header, disclaimer text, which fields appear, and whether you want a client-facing summary page.', help:['coa']},
+  {t:'Review the Confident COA template example',          ph:'p2', side:'lab',       desc:'A worked example of a finished COA, so you can see the layout and field placement before telling us what you want changed.', help:['coa'], docs:['coaExample']},
+  {t:'Confirm your COA template preferences',              ph:'p2', side:'lab',       desc:'Logo, header, disclaimer text, which fields appear, and whether you want a client-facing summary page. Compare against the worked example above.', help:['coa'], docs:['coaExample']},
 
   {t:'Provide your instrument list and export formats',    ph:'p3', side:'lab',       desc:'Make, model, and software for each instrument, plus one sample export file per instrument.', help:['importers']},
   {t:'Upload sample instrument export files',             ph:'p3', side:'lab',       desc:'Raw exports, unedited. We use these to build the importers, so representative files matter more than clean ones.', help:['importers']},
@@ -482,34 +576,45 @@ const TASK_TEMPLATES = TEMPLATE_TASKS.map(t => ({
 let PTMPL_ID = 0;
 const PHASE_TEMPLATES = [
   {id:'pt'+(++PTMPL_ID), name:'LIMS — Starter',       line:'LIMS',         tier:'Starter',
-   phaseNames:{}, taskIds:TASK_TEMPLATES.filter(t=>!/Metrc/i.test(t.title)).map(t=>t.id)},
+   phases:clonePhases(), phaseNames:{}, taskPhase:{}, taskIds:TASK_TEMPLATES.filter(t=>!/Metrc/i.test(t.title)).map(t=>t.id)},
   {id:'pt'+(++PTMPL_ID), name:'LIMS — Pro',           line:'LIMS',         tier:'Pro',
-   phaseNames:{}, taskIds:TASK_TEMPLATES.filter(t=>!/Metrc/i.test(t.title)).map(t=>t.id)},
+   phases:clonePhases(), phaseNames:{}, taskPhase:{}, taskIds:TASK_TEMPLATES.filter(t=>!/Metrc/i.test(t.title)).map(t=>t.id)},
   {id:'pt'+(++PTMPL_ID), name:'LIMS — Premium',       line:'LIMS',         tier:'Premium',
-   phaseNames:{}, taskIds:TASK_TEMPLATES.map(t=>t.id)},
+   phases:clonePhases(), phaseNames:{}, taskPhase:{}, taskIds:TASK_TEMPLATES.map(t=>t.id)},
   {id:'pt'+(++PTMPL_ID), name:'Network Only — Basic', line:'Network Only', tier:'Basic',
-   phaseNames:{p3:'Data Handoff'}, taskIds:TASK_TEMPLATES.filter(t=>t.phase!=='p3').map(t=>t.id)}
+   phases:clonePhases(), phaseNames:{p3:'Data Handoff'}, taskPhase:{}, taskIds:TASK_TEMPLATES.filter(t=>t.phase!=='p3').map(t=>t.id)}
 ];
+/* Every template carries the same v3 shape, including ones restored from an older
+   saved payload that predates phases/taskPhase. */
+function normalizeTemplate(p){
+  if(!Array.isArray(p.phases) || !p.phases.length) p.phases = clonePhases();
+  p.phases = p.phases.map((ph,i) => ({...ph, order:i+1, dueOffset: typeof ph.dueOffset==='number' ? ph.dueOffset : (i+1)*21}));
+  if(!p.phaseNames || typeof p.phaseNames !== 'object') p.phaseNames = {};
+  if(!p.taskPhase  || typeof p.taskPhase  !== 'object') p.taskPhase  = {};
+  if(!Array.isArray(p.taskIds)) p.taskIds = [];
+  return p;
+}
+PHASE_TEMPLATES.forEach(normalizeTemplate);
 
 /* ---------- Lab (outline §6) — real lab names from the Notion hub ----------
    v2 adds abbrev / state (captured on the Create New Lab form) and users, which
    is what the per-task assignee picker offers on the lab side. */
 const LABS = [
-  {slug:'sky-analytics',      name:'Sky Analytics',         abbrev:'SKY',  state:'CO', line:'LIMS',         tier:'Pro',     am:'Elliot Reese',   start:'2026-07-14', done:8,  users:['Priya Raman','Marco Deleon']},
-  {slug:'montana-analytical', name:'Montana Analytical',    abbrev:'MTA',  state:'MT', line:'LIMS',         tier:'Premium', am:'Elliot Reese',   start:'2026-06-02', done:15, users:['Hannah Wexler','Cole Brannan']},
-  {slug:'phytolab-mn',        name:'PhytoLab MN',           abbrev:'PLM',  state:'MN', line:'LIMS',         tier:'Starter', am:'Elliot Reese',   start:'2026-08-19', done:3,  users:['Tom Reyes','Sarah Lindqvist']},
-  {slug:'chri-laboratories',  name:'ChRi Laboratories',     abbrev:'CHRI', state:'OR', line:'LIMS',         tier:'Pro',     am:'Elliot Reese',   start:'2026-05-11', done:11, users:['Dev Chaudhary','Ana Ruiz']},
-  {slug:'sc-laboratories-ca', name:'SC Laboratories CA',    abbrev:'SCL',  state:'CA', line:'LIMS',         tier:'Premium', am:'Dana Whitfield', start:'2026-07-28', done:9,  users:['Jordan Pike','Mei Tanaka']},
-  {slug:'cannabis-chemlab',   name:'Cannabis ChemLab MN',   abbrev:'CCM',  state:'MN', line:'Network Only', tier:'Pro',     am:'Dana Whitfield', start:'2026-08-04', done:6,  users:['Ben Hollis','Rachel Adeyemi']},
-  {slug:'trumo-analytics',    name:'TruMo Analytics',       abbrev:'TRU',  state:'MO', line:'LIMS',         tier:'Starter', am:'Dana Whitfield', start:'2026-08-25', done:2,  users:['Kayla Struthers','Owen Petrakis']},
-  {slug:'alien-testing-nm',   name:'Alien Testing Labs NM', abbrev:'ATL',  state:'NM', line:'Network Only', tier:'Basic',   am:'Marcus Oyelaran',start:'2026-06-16', done:12, users:['Luis Ortega','Fern Whitlock']},
-  {slug:'optiq-health',       name:'Optiq Health Labs',     abbrev:'OPT',  state:'MA', line:'LIMS',         tier:'Premium', am:'Marcus Oyelaran',start:'2026-04-20', done:17, users:['Nina Barzani','Greg Sandoval']},
-  {slug:'steadfast-labs-ny',  name:'Steadfast Labs NY',     abbrev:'STL',  state:'NY', line:'Network Only', tier:'Premium', am:'Marcus Oyelaran',start:'2026-08-11', done:5,  users:['Aaron Feldman','Chloe Mbeki']},
-  {slug:'lifted-testing',     name:'Lifted Testing',        abbrev:'LFT',  state:'MI', line:'LIMS',         tier:'Pro',     am:'Dana Whitfield', start:'2026-07-07', done:10, users:['Nadia Okafor','Jim Castellano']},
+  {slug:'northgate-analytical', name:'Northgate Analytical',   abbrev:'NGA', state:'CO', line:'LIMS',         tier:'Pro',     am:'Elliot Reese',   start:'2026-07-14', done:8,  users:['Imani Breslow','Victor Amaya'], industries:['Cannabis','Hemp'], linearUrl:'https://linear.app/confident/project/northgate-analytical-onboarding'},
+  {slug:'clearwater-testing',   name:'Clearwater Testing Co',  abbrev:'CWT', state:'MT', line:'LIMS',         tier:'Premium', am:'Elliot Reese',   start:'2026-06-02', done:15, users:['Rosa Lindholm','Teddy Varga'], industries:['Cannabis'], statusNote:'Waiting on a regulator response about the new matrix rule.', linearUrl:'https://linear.app/confident/project/clearwater-testing-onboarding'},
+  {slug:'birchwood-labs',       name:'Birchwood Labs',         abbrev:'BWL', state:'MN', line:'LIMS',         tier:'Starter', am:'Elliot Reese',   start:'2026-08-19', done:3,  users:['Omar Castellanos','Hallie Pruitt']},
+  {slug:'ridgeline-scientific', name:'Ridgeline Scientific',   abbrev:'RDG', state:'OR', line:'LIMS',         tier:'Pro',     am:'Elliot Reese',   start:'2026-05-11', done:11, users:['Sunil Oyelowo','Margot Feeney'], industries:['Cannabis','Environmental'], statusNote:'Quote needed for the custom importer on the legacy LC.'},
+  {slug:'pacifica-analytical',  name:'Pacifica Analytical',    abbrev:'PCA', state:'CA', line:'LIMS',         tier:'Premium', am:'Dana Whitfield', start:'2026-07-28', done:9,  users:['Jonah Kittridge','Wen Arakawa']},
+  {slug:'blue-heron-labs',      name:'Blue Heron Labs',        abbrev:'BHL', state:'MN', line:'Network Only', tier:'Pro',     am:'Dana Whitfield', start:'2026-08-04', done:6,  users:['Caleb Nwosu','Simone Darrow']},
+  {slug:'prairie-state-testing',name:'Prairie State Testing',  abbrev:'PST', state:'MO', line:'LIMS',         tier:'Starter', am:'Dana Whitfield', start:'2026-08-25', done:2,  users:['Delia Marchetti','Roy Ellsworth']},
+  {slug:'mesa-verde-labs',      name:'Mesa Verde Labs',        abbrev:'MVL', state:'NM', line:'Network Only', tier:'Basic',   am:'Marcus Oyelaran',start:'2026-06-16', done:12, users:['Alonso Rivera-Fay','Tess Buhler'], industries:['Food & Beverage'], statusNote:'No reply to the last three emails — chasing a new contact.'},
+  {slug:'quarry-hill-diag',     name:'Quarry Hill Diagnostics',abbrev:'QHD', state:'MA', line:'LIMS',         tier:'Premium', am:'Marcus Oyelaran',start:'2026-04-20', done:17, users:['Ingrid Solano','Pete Varnavas']},
+  {slug:'hudson-line-labs',     name:'Hudson Line Labs',       abbrev:'HLL', state:'NY', line:'Network Only', tier:'Premium', am:'Marcus Oyelaran',start:'2026-08-11', done:5,  users:['Micah Devereaux','Zoe Abara']},
+  {slug:'great-lakes-assay',    name:'Great Lakes Assay',      abbrev:'GLA', state:'MI', line:'LIMS',         tier:'Pro',     am:'Dana Whitfield', start:'2026-07-07', done:10, users:['Fiona Tamblyn','Russ Okonkwo']},
   /* v2 seeds two finished labs so the Completed labs section on the dashboard has
      something to show. done is set past the task count, which marks every task done. */
-  {slug:'greenline-labs-wa',  name:'GreenLine Labs WA',     abbrev:'GLW',  state:'WA', line:'LIMS',         tier:'Starter', am:'Elliot Reese',   start:'2026-03-09', done:99, users:['Erin Vasquez','Paul Nakamura']},
-  {slug:'crescent-analytics', name:'Crescent Analytics',    abbrev:'CRA',  state:'AZ', line:'Network Only', tier:'Pro',     am:'Dana Whitfield', start:'2026-02-24', done:99, users:['Sofia Marchetti','Dale Pruitt']}
+  {slug:'cedar-fork-labs',      name:'Cedar Fork Labs',        abbrev:'CFL', state:'WA', line:'LIMS',         tier:'Starter', am:'Elliot Reese',   start:'2026-03-09', done:99, users:['Lena Hartigan','Sam Okoye'], industries:['Cannabis'], sentiment:'smooth'},
+  {slug:'saltflat-analytics',   name:'Saltflat Analytics',     abbrev:'SFA', state:'AZ', line:'Network Only', tier:'Pro',     am:'Dana Whitfield', start:'2026-02-24', done:99, users:['Bea Fontaine','Curtis Mwangi']}
 ];
 
 /* Every lab carries the same v2 config slots. Filling them here rather than in
@@ -523,16 +628,52 @@ function normalizeLab(l){
   if(typeof l.internalNotes !== 'string') l.internalNotes = '';
   if(typeof l.abbrev !== 'string')  l.abbrev = '';
   if(typeof l.state !== 'string')   l.state = '';
+  /* v3. phases is the lab's own snapshot of whatever template built it — a later
+     edit to that template must not reshape a live checklist, so the lab owns a copy.
+     phaseDue holds per-lab date overrides on top of the snapshot's dueOffset. */
+  if(!Array.isArray(l.phases) || !l.phases.length) l.phases = clonePhases();
+  l.phases = l.phases.map((p,i) => ({...p, order:i+1, dueOffset: typeof p.dueOffset==='number' ? p.dueOffset : (i+1)*21}));
+  if(!l.phaseDue || typeof l.phaseDue !== 'object') l.phaseDue = {};
+  if(!Array.isArray(l.industries))  l.industries = [];
+  if(typeof l.statusNote !== 'string')  l.statusNote = '';
+  if(typeof l.linearUrl  !== 'string')  l.linearUrl  = '';
+  if(typeof l.sentiment  !== 'string')  l.sentiment  = '';
+  l.archived = !!l.archived;
   return l;
 }
 LABS.forEach(normalizeLab);
 
-/* Resolve the phase list for one lab: defaults, with any AM rename layered on. */
+/* Resolve the phase list for one lab: its own snapshot, with any AM rename layered on.
+   Falls back to the portal defaults for a lab object that has no snapshot yet (which is
+   what a bare {} from a caller or an old saved payload looks like). */
 function phasesFor(l){
   const over = (l && l.phaseNames) || {};
-  return PHASES.map(p => over[p.id] ? {...p, name:over[p.id]} : p);
+  const base = (l && Array.isArray(l.phases) && l.phases.length) ? l.phases : PHASES;
+  return base.map((p,i) => ({...p, order:i+1, name: over[p.id] || p.name}));
 }
 function phaseOfLab(l, id){ return phasesFor(l).find(p => p.id === id); }
+
+/* v3: phase due dates. The template's dueOffset is days from the lab's start date;
+   an AM override in Lab settings wins over the computed date. Returns '' when the lab
+   has no start date to count from, and every caller treats '' as "no date set". */
+const addDays = (iso, days) => new Date(new Date(iso+'T12:00:00Z').getTime() + days*864e5).toISOString().slice(0,10);
+function phaseDue(l, p){
+  if(!l) return '';
+  if(l.phaseDue && l.phaseDue[p.id]) return l.phaseDue[p.id];
+  if(!l.start || typeof p.dueOffset !== 'number') return '';
+  return addDays(l.start, p.dueOffset);
+}
+/* A phase is overdue when its date has passed and it still has unfinished work.
+   v3 moved dates off individual tasks, so this is the only overdue signal there is. */
+function phaseOverdue(l, p){
+  const due = phaseDue(l, p);
+  if(!due) return false;
+  const ts = (TASKS[l.slug] || []).filter(t => t.phase === p.id);
+  if(!ts.length || ts.every(isDone)) return false;
+  return new Date(due+'T12:00:00Z') < TODAY;
+}
+const latePhases = l => phasesFor(l).filter(p => phaseOverdue(l, p));
+const daysLate = due => Math.round((TODAY - new Date(due+'T12:00:00Z'))/864e5);
 
 /* ---------- build Task rows per lab from the template ---------- */
 let TASK_ID = 0;
@@ -544,21 +685,20 @@ function buildTasks(lab){
     title:t.t, desc:t.desc, phase:t.ph, ownerSide:t.side,
     assignee: t.side==='lab' ? lab.name+' team' : lab.am,
     status: i < lab.done ? 'Done' : 'Not started',
-    dueDate: new Date(startMs + (i+1)*4*864e5).toISOString().slice(0,10),
     completedAt: i < lab.done ? new Date(startMs + (i+1)*3.4*864e5).toISOString().slice(0,10) : null,
     source:'template', createdBy:'Onboarding template ('+lab.line+' '+lab.tier+')',
     order:i, help:(t.help||[]).map(k=>HELP[k]), docs:(t.docs||[]).map(k=>DOCS[k]),
-    comments:[]
+    linearUrls:[], comments:[]
   }));
 }
 /* v2 adds user settings. The demo can be viewed as either side, so it carries one
    identity per side and swaps which is "you" with the role toggle. currentUser is
    kept in step with me.am.name because the My-labs filter matches on it. */
 const STATE = {
-  role:'lab', labSlug:'sky-analytics', amScope:'mine', amLab:null,
+  role:'lab', labSlug:'northgate-analytical', amScope:'mine', amLab:null,
   currentUser:'Elliot Reese',
   me:{
-    lab:{name:'Priya Raman',  role:'Lab Director'},
+    lab:{name:'Imani Breslow',  role:'Lab Director'},
     am: {name:'Elliot Reese', role:'Account Manager'}
   }
 };
@@ -568,40 +708,47 @@ const TASKS = {};
 LABS.forEach(l => TASKS[l.slug] = buildTasks(l));
 
 /* a few non-template tasks, to show two-sided creation (outline §5.4) */
-TASKS['sky-analytics'].push({
+TASKS['northgate-analytical'].push({
   id:'t'+(++TASK_ID), title:'Send us the Q3 client list for network invites',
   desc:'Added after the kickoff call — Sky wants their existing clients invited before go-live.',
-  phase:'p2', ownerSide:'lab', assignee:'Sky Analytics team', status:'In progress',
-  dueDate:'2026-09-12', completedAt:null, source:'am-created', createdBy:'Elliot Reese (Account Manager)',
-  order:99, help:[], docs:[],
+  phase:'p2', ownerSide:'lab', assignee:'Northgate Analytical team', status:'In progress',
+  completedAt:null, source:'am-created', createdBy:'Elliot Reese (Account Manager)',
+  order:99, help:[], docs:[], linearUrls:[],
   comments:[{who:'Elliot Reese', role:'confident', when:'2 days ago', txt:'No rush on this one, but it unblocks the client invite step later.'}]
 });
-TASKS['sky-analytics'].push({
+TASKS['northgate-analytical'].push({
   id:'t'+(++TASK_ID), title:'Help — our terpene export has two header rows',
   desc:'Raised by the lab. The GC export from the new instrument has a merged header that the importer is choking on.',
   phase:'p3', ownerSide:'confident', assignee:'Elliot Reese', status:'In progress',
-  dueDate:'2026-09-10', completedAt:null, source:'lab-created', createdBy:'Priya Raman (Sky Analytics)',
+  completedAt:null, source:'lab-created', createdBy:'Imani Breslow (Northgate Analytical)',
   order:98, help:[HELP.importers], docs:[],
+  linearUrls:['https://linear.app/confident/issue/ENG-4417/terpene-export-merged-header'],
   comments:[
-    {who:'Priya Raman', role:'lab', when:'yesterday', txt:'Attached two exports. The second one is from the new GC.'},
+    {who:'Imani Breslow', role:'lab', when:'yesterday', txt:'Attached two exports. The second one is from the new GC.'},
     {who:'Elliot Reese', role:'confident', when:'4 hours ago', txt:'Got them — we can handle the merged header in the importer config. No change needed on your side.'}
   ]
 });
-TASKS['phytolab-mn'].push({
+TASKS['birchwood-labs'].push({
   id:'t'+(++TASK_ID), title:'Help — can we report two matrices on one COA?',
   desc:'Raised by the lab during setup.', phase:'p2', ownerSide:'confident',
-  assignee:'Elliot Reese', status:'Not started', dueDate:'2026-09-11', completedAt:null,
-  source:'lab-created', createdBy:'Tom Reyes (PhytoLab MN)', order:97, help:[HELP.coa], docs:[], comments:[]
+  assignee:'Elliot Reese', status:'Not started', completedAt:null,
+  source:'lab-created', createdBy:'Omar Castellanos (Birchwood Labs)', order:97, help:[HELP.coa], docs:[],
+  linearUrls:[], comments:[]
 });
+
+/* v3: every task carries linearUrls and no longer carries dueDate, including ones
+   restored from a saved v2 payload. Run after the seed pushes above. */
+function normalizeTasks(){ Object.keys(TASKS).forEach(s => (TASKS[s]||[]).forEach(normTask)); }
+normalizeTasks();
 
 /* ---------- ActivityEvent stream (outline §6 / §5.7) ---------- */
 const ACTIVITY = [
-  {kind:'complete', lab:'Sky Analytics',      txt:'<b>Priya Raman</b> completed “Provide your client-facing pricing sheet”', when:'3h ago'},
-  {kind:'created',  lab:'PhytoLab MN',        txt:'<b>Tom Reyes</b> raised a request: “Can we report two matrices on one COA?”', when:'5h ago'},
-  {kind:'complete', lab:'Optiq Health Labs',  txt:'<b>Marcus Oyelaran</b> completed “Configure compliance limits and state rules”', when:'yesterday'},
-  {kind:'phase',    lab:'Montana Analytical', txt:'<b>Montana Analytical</b> moved into <b>Validation &amp; Go-Live</b>', when:'yesterday'},
-  {kind:'stall',    lab:'ChRi Laboratories',  txt:'<b>ChRi Laboratories</b> has had no activity for 9 days', when:'2d ago'},
-  {kind:'complete', lab:'Lifted Testing',     txt:'<b>Nadia Okafor</b> completed “Upload sample instrument export files”', when:'2d ago'}
+  {kind:'complete', lab:'Northgate Analytical',      txt:'<b>Imani Breslow</b> completed “Provide your client-facing pricing sheet”', when:'3h ago'},
+  {kind:'created',  lab:'Birchwood Labs',        txt:'<b>Omar Castellanos</b> raised a request: “Can we report two matrices on one COA?”', when:'5h ago'},
+  {kind:'complete', lab:'Quarry Hill Diagnostics',  txt:'<b>Marcus Oyelaran</b> completed “Configure compliance limits and state rules”', when:'yesterday'},
+  {kind:'phase',    lab:'Clearwater Testing Co', txt:'<b>Clearwater Testing Co</b> moved into <b>Validation &amp; Go-Live</b>', when:'yesterday'},
+  {kind:'stall',    lab:'Ridgeline Scientific',  txt:'<b>Ridgeline Scientific</b> has had no activity for 9 days', when:'2d ago'},
+  {kind:'complete', lab:'Great Lakes Assay',     txt:'<b>Fiona Tamblyn</b> completed “Upload sample instrument export files”', when:'2d ago'}
 ];
 
 /* ---------- demo persistence ----------
@@ -645,7 +792,7 @@ function loadState(){
     }
     if(Array.isArray(d.phaseTemplates) && d.phaseTemplates.length){
       PHASE_TEMPLATES.length = 0;
-      d.phaseTemplates.forEach(t => PHASE_TEMPLATES.push(t));
+      d.phaseTemplates.forEach(t => PHASE_TEMPLATES.push(normalizeTemplate(t)));
     }
     if(typeof d.tmplId  === 'number') TMPL_ID  = Math.max(TMPL_ID,  d.tmplId);
     if(typeof d.ptmplId === 'number') PTMPL_ID = Math.max(PTMPL_ID, d.ptmplId);
@@ -664,6 +811,7 @@ function loadState(){
       else if(!TASKS[l.slug]){ TASKS[l.slug] = buildTasks(l); }
     });
     if(!adopted) return false;
+    normalizeTasks();
     if(Array.isArray(d.activity)){ ACTIVITY.length = 0; d.activity.forEach(a => ACTIVITY.push(a)); }
     if(typeof d.taskId === 'number') TASK_ID = Math.max(TASK_ID, d.taskId);
     if(d.view){
@@ -688,7 +836,11 @@ const isDone = t => t.status === 'Done';
 const daysIn = l => Math.round((TODAY - new Date(l.start+'T12:00:00Z'))/864e5);
 const progress = s => { const t = tasksFor(s); return {done:t.filter(isDone).length, total:t.length}; };
 const nextTask = s => tasksFor(s).find(t => !isDone(t));
-const overdue = t => !isDone(t) && new Date(t.dueDate+'T12:00:00Z') < TODAY;
+/* v3 removed per-task due dates. Overdue is a property of a phase now — see
+   phaseOverdue — so nothing asks a task whether it is late. */
+/* Declared, not assigned to a const: the seed pass below runs before this point in
+   the file and a const would still be in its temporal dead zone when it is called. */
+function normTask(t){ if(!Array.isArray(t.linearUrls)) t.linearUrls = []; delete t.dueDate; return t; }
 const initials = n => n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 /* Phase lookups go through the lab so an AM rename in Lab Settings shows up
    everywhere the phase is named, not just in the task list. */
@@ -714,10 +866,18 @@ function docsFor(l){
   }
   return planDocs(l);
 }
+/* v3. The two templated links carry a `labslug` placeholder in the source material;
+   substituting the lab's own slug is what makes them usable per lab. The other four
+   are fixed. Titles come from the copy agreed on the V3 list. */
 const LAB_LINKS = l => [
-  {title:'Lab login',           url:'https://accounts.confidentlims.com/login?lab='+l.slug},
-  {title:'Submit a new order',  url:'https://accounts.confidentlims.com/login?redirectToApp=labtesting&redirectToPath=orders/new/samples?lab='+l.slug},
-  {title:'Help Articles',       url:'https://help.confidentlims.com'}
+  {title:'Lab login',  url:'https://app.confidentlims.com/'},
+  {title:'Link to place an order directly with the lab for clients that already have an account',
+   url:'https://accounts.confidentlims.com/login?redirectToApp=labtesting&redirectToPath=orders/new/samples?lab='+l.slug},
+  {title:'Invite to Confident for new Client Portal accounts',
+   url:'https://accounts.confidentlims.com/login?lab='+l.slug},
+  {title:'Pricing',        url:'https://www.confidentlims.com/pricing'},
+  {title:'API Docs',       url:'https://api.confidentlims.com/v0/docs/'},
+  {title:'Help Articles',  url:'https://help.confidentlims.com'}
 ];
 
 const ICON = {
@@ -757,13 +917,19 @@ function renderTasks(slug, mode){
     if(!ts.length) return '';
     const d = ts.filter(isDone).length;
     const k = ckey(slug,p.id), col = !!COLLAPSED[k];
-    return `<div class="phase" data-phase-key="${esc(k)}" data-collapsed="${col?1:0}">
+    /* v3: the date and the overdue state live here, not on the task rows below. */
+    const due = phaseDue(l, p), late = phaseOverdue(l, p);
+    return `<div class="phase" data-phase-key="${esc(k)}" data-collapsed="${col?1:0}" data-late="${late?1:0}">
       <div class="phase-head" role="button" tabindex="0" aria-expanded="${col?'false':'true'}"
         onclick="togglePhase('${slug}','${p.id}')"
         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePhase('${slug}','${p.id}')}">
         <span class="phase-caret" aria-hidden="true">${ICON.caret}</span>
         <span class="phase-badge">Phase ${p.order}</span>
         <h3>${esc(p.name)}</h3>
+        ${due ? `<span class="phase-due ${late?'late':''}">${late
+            ? 'Due '+esc(due)+' · '+daysLate(due)+' days late'
+            : 'Due '+esc(due)}</span>` : ''}
+        ${late ? '<span class="chip chip-late">Overdue</span>' : ''}
         <div class="phase-meter">
           <div class="bar"><span style="width:${Math.round(d/ts.length*100)}%"></span></div>
           <span class="n">${d}/${ts.length}</span>
@@ -805,7 +971,19 @@ function renderTask(t,l,mode){
     : `<span class="chip chip-conf">${mode==='lab' ? 'Confident' : 'Waiting on us'}</span>`;
   const srcChip = t.source==='template' ? ''
     : `<span class="chip chip-src">${t.source==='lab-created' ? 'Lab added' : 'AM added'}</span>`;
-  const lateChip = overdue(t) ? `<span class="chip chip-late">Overdue</span>` : '';
+  /* v3 permission rule: the lab may remove only what the lab raised. Template and
+     AM-assigned work is undeletable from the lab side, so a lab cannot shrink its own
+     denominator and read as finished. An AM may delete anything. */
+  const canDelete = mode==='am' || t.source==='lab-created';
+  /* Linear tickets are internal. The lab never sees this block. */
+  const linear = (mode==='am' && (t.linearUrls||[]).length)
+    ? `<div class="linearbox">
+        <span class="overline">Linear tickets</span>
+        ${t.linearUrls.map((u,i)=>`<div class="linearrow">
+          <a href="${esc(u)}" target="_blank" rel="noopener">${ICON.ext}<span>${esc(linearLabel(u))}</span></a>
+          <button type="button" class="xbtn" onclick="removeLinear('${t.id}',${i})" aria-label="Remove ticket">&times;</button>
+        </div>`).join('')}
+      </div>` : '';
   const attach = [
     ...(t.docs||[]).map(d=>`<a href="#" onclick="return false">${ICON.doc}<span>${esc(d.title)} <span class="muted mono" style="font-size:11px">PDF</span></span></a>`),
     ...(t.help||[]).map(h=>`<a href="${esc(h.url)}" target="_blank" rel="noopener">${ICON.help}<span>${esc(h.title)}</span></a>`)
@@ -818,11 +996,14 @@ function renderTask(t,l,mode){
       <div class="task-body">
         <button class="task-title" onclick="openTask('${t.id}')">${esc(t.title)}</button>
         <div class="task-meta">
-          ${sideChip}${srcChip}${lateChip}
-          <span class="task-date">${done ? 'Completed '+t.completedAt : 'Due '+t.dueDate}</span>
-          ${t.comments.length?`<span class="task-date">· ${t.comments.length} comment${t.comments.length>1?'s':''}</span>`:''}
+          ${sideChip}${srcChip}
+          ${done ? `<span class="task-date">Completed ${esc(t.completedAt)}</span>` : ''}
+          ${mode==='am' && (t.linearUrls||[]).length ? `<span class="chip chip-linear">${t.linearUrls.length} Linear</span>` : ''}
+          ${t.comments.length?`<span class="task-date">${done?'· ':''}${t.comments.length} comment${t.comments.length>1?'s':''}</span>`:''}
         </div>
       </div>
+      ${canDelete ? `<button class="task-del" onclick="openDeleteTask('${t.id}','${mode}')"
+        aria-label="Delete task" title="Delete this task">&times;</button>` : ''}
     </div>
     <div class="task-expand">
       <p class="task-desc">${esc(t.desc)}</p>
@@ -848,6 +1029,12 @@ function renderTask(t,l,mode){
             ${assignOptions(l,t).map(n=>`<option value="${esc(n)}"${n===t.assignee?' selected':''}>${esc(n)}</option>`).join('')}
           </select>
         </div>
+        ${mode==='am' ? `${linear}
+        <form class="linearform" onsubmit="addLinear(event,'${t.id}')">
+          <input name="url" type="url" placeholder="Paste a Linear ticket URL…" aria-label="Linear ticket URL">
+          <button class="btn-ghost" type="submit">Link</button>
+        </form>` : ''}
+        ${mode==='lab' ? `<p style="margin-top:12px"><a class="helplink" href="${helpMailto(l,t)}">Request help with this task →</a></p>` : ''}
         <p class="muted mono" style="font-size:10.5px;margin-top:8px">
           Created by ${esc(t.createdBy)}
         </p>
@@ -891,7 +1078,10 @@ function renderLab(){
           <h2>Your onboarding checklist</h2>
           <p class="muted" style="font-size:14px;margin-top:4px">Shared with your Confident team — you both see and edit the same list.</p>
         </div>
-        <button class="btn-ghost" onclick="openAdd('lab')">+ Add task or request help</button>
+        <div class="headbtns">
+          <button class="btn-ghost" onclick="openAdd('lab')">+ Add task</button>
+          <a class="btn-ghost" href="${helpMailto(l, null)}">Request help</a>
+        </div>
       </div>
       ${renderTasks(l.slug,'lab')}
     </div>
@@ -924,6 +1114,12 @@ function renderLab(){
         </div>
       </div>
 
+      ${!n ? `<div class="card filled">
+        <span class="overline">One last thing</span>
+        <p style="font-size:13.5px;margin:10px 0 14px">Your checklist is complete. Tell us how onboarding went — it takes about three minutes and it is the main thing that changes how we run the next one.</p>
+        <a class="btn-coral" href="${SURVEY_URL}" target="_blank" rel="noopener">Post-onboarding survey</a>
+      </div>` : ''}
+
       <div class="card">
         <span class="overline">Help articles</span>
         <div class="linklist">
@@ -938,12 +1134,15 @@ function renderLab(){
 
 /* ---------- render: AM portfolio (outline §5.6) ---------- */
 function renderAmPortfolio(){
-  const scoped = STATE.amScope==='mine' ? LABS.filter(l=>l.am===STATE.currentUser) : LABS;
+  const live = LABS.filter(l => !l.archived);
+  const scoped = STATE.amScope==='mine' ? live.filter(l=>l.am===STATE.currentUser) : live;
+  const archived = (STATE.amScope==='mine' ? LABS.filter(l=>l.am===STATE.currentUser) : LABS).filter(l=>l.archived);
   const rows = scoped.map(l=>{
     const pr = progress(l.slug), n = nextTask(l.slug), ph = currentPhase(l.slug);
     const d = daysIn(l);
-    const late = tasksFor(l.slug).filter(overdue).length;
-    return {l, pr, n, ph, d, late, stalled: late>0 || d>75};
+    /* v3: overdue is counted in phases now, not tasks. */
+    const lp = latePhases(l);
+    return {l, pr, n, ph, d, lp, stalled: lp.length>0 || d>75};
   });
   /* v2 splits the portfolio in two. A lab with no next task has nothing left to chase,
      so keeping it in the main table pads the list with rows that need no attention and
@@ -951,6 +1150,8 @@ function renderAmPortfolio(){
      stats above describe only the labs still in flight. */
   const active   = rows.filter(r => r.n);
   const complete = rows.filter(r => !r.n);
+  /* The AM column only earns its width when the view actually spans several AMs. */
+  const showAm = STATE.amScope === 'all';
   const blockedOnLab = active.filter(r=>r.n.ownerSide==='lab').length;
   const blockedOnUs  = active.filter(r=>r.n.ownerSide==='confident').length;
   const atRisk = active.filter(r=>r.stalled).length;
@@ -984,20 +1185,28 @@ function renderAmPortfolio(){
       <div class="tablewrap">
         <table>
           <thead><tr>
-            <th>Lab</th><th>Plan</th><th>Phase</th><th>Progress</th><th>Days</th><th>Waiting on</th><th>AM</th>
+            <th>Lab</th><th>Plan</th><th>Phase</th><th>Progress</th><th>Days</th><th>Waiting on</th>${showAm?'<th>AM</th>':''}
           </tr></thead>
           <tbody>
           ${active.length ? active.map(r=>`<tr data-stalled="${r.stalled?1:0}" onclick="openAmLab('${r.l.slug}')">
-            <td><span class="labname">${esc(r.l.name)}</span></td>
-            <td><span class="tier">${esc(r.l.line)}<br>${esc(r.l.tier)}</span></td>
+            <td>
+              <span class="labname">${esc(r.l.name)}</span>
+              ${r.l.linearUrl ? `<a class="linearicon" href="${esc(r.l.linearUrl)}" target="_blank" rel="noopener"
+                 onclick="event.stopPropagation()" title="Onboarding project in Linear">${ICON.ext}</a>` : ''}
+              ${r.l.statusNote ? `<span class="statusnote">${esc(r.l.statusNote)}</span>` : ''}
+            </td>
+            <td>
+              <span class="tier">${esc(r.l.line)}<br>${esc(r.l.tier)}</span>
+              ${(r.l.industries||[]).length ? `<span class="tagrow">${r.l.industries.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</span>` : ''}
+            </td>
             <td><span class="phase-badge">P${r.ph.order} ${esc(r.ph.name)}</span></td>
             <td><div class="minibar"><div class="bar"><span style="width:${Math.round(r.pr.done/r.pr.total*100)}%"></span></div><span class="n">${r.pr.done}/${r.pr.total}</span></div></td>
             <td><span class="days ${r.d>75?'over':''}">${r.d}d</span></td>
             <td>${(r.n.ownerSide==='lab' ? '<span class="chip chip-lab">Lab</span>' : '<span class="chip chip-conf">Us</span>')
-                  + (r.late?` <span class="chip chip-late">${r.late} overdue</span>`:'')}</td>
-            <td class="muted" style="font-size:13px">${esc(r.l.am)}</td>
+                  + (r.lp.length?` <span class="chip chip-late">${esc(r.lp[0].name)}, ${daysLate(phaseDue(r.l, r.lp[0]))}d late</span>`:'')}</td>
+            ${showAm?`<td class="muted" style="font-size:13px">${esc(r.l.am)}</td>`:''}
           </tr>`).join('')
-          : `<tr><td colspan="7"><span class="emptyhint">No labs in onboarding${STATE.amScope==='mine'?' assigned to you':''} right now.</span></td></tr>`}
+          : `<tr><td colspan="${showAm?7:6}"><span class="emptyhint">No labs in onboarding${STATE.amScope==='mine'?' assigned to you':''} right now.</span></td></tr>`}
           </tbody>
         </table>
       </div>
@@ -1012,7 +1221,7 @@ function renderAmPortfolio(){
       ${complete.length ? `<div class="tablewrap">
         <table class="donetable">
           <thead><tr>
-            <th>Lab</th><th>Plan</th><th>Progress</th><th>Onboarding took</th><th>Status</th><th>AM</th>
+            <th>Lab</th><th>Plan</th><th>Progress</th><th>Onboarding took</th><th>How it went</th><th>AM</th>
           </tr></thead>
           <tbody>
           ${complete.map(r=>`<tr onclick="openAmLab('${r.l.slug}')">
@@ -1020,12 +1229,39 @@ function renderAmPortfolio(){
             <td><span class="tier">${esc(r.l.line)}<br>${esc(r.l.tier)}</span></td>
             <td><div class="minibar"><div class="bar"><span style="width:100%"></span></div><span class="n">${r.pr.done}/${r.pr.total}</span></div></td>
             <td><span class="days">${r.d}d</span></td>
-            <td><span class="chip chip-src">Complete</span></td>
+            <td onclick="event.stopPropagation()">
+              <select class="sentiment" data-v="${esc(r.l.sentiment||'')}" aria-label="How onboarding went for ${esc(r.l.name)}"
+                onchange="setSentiment('${r.l.slug}', this.value); this.setAttribute('data-v', this.value)">
+                ${SENTIMENTS.map(x=>`<option value="${x.key}"${(r.l.sentiment||'')===x.key?' selected':''}>${esc(x.label)}</option>`).join('')}
+              </select>
+            </td>
             <td class="muted" style="font-size:13px">${esc(r.l.am)}</td>
           </tr>`).join('')}
           </tbody>
         </table>
       </div>` : `<span class="emptyhint">No labs have finished onboarding${STATE.amScope==='mine'?' under you':''} yet.</span>`}
+
+      ${archived.length ? `
+      <div class="sectionhead" style="margin-top:38px">
+        <div>
+          <h2 style="font-size:20px">Archived labs</h2>
+          <p class="muted" style="font-size:13.5px;margin-top:4px">Out of the portfolio, kept on file. Restore one to put it back.</p>
+        </div>
+      </div>
+      <div class="tablewrap">
+        <table class="donetable">
+          <thead><tr><th>Lab</th><th>Plan</th><th>Progress</th><th>AM</th><th></th></tr></thead>
+          <tbody>
+          ${archived.map(l=>{ const pr = progress(l.slug); return `<tr>
+            <td><span class="labname">${esc(l.name)}</span></td>
+            <td><span class="tier">${esc(l.line)}<br>${esc(l.tier)}</span></td>
+            <td><span class="n mono" style="font-size:12px">${pr.done}/${pr.total}</span></td>
+            <td class="muted" style="font-size:13px">${esc(l.am)}</td>
+            <td><button class="btn-ghost" onclick="restoreLab('${l.slug}')">Restore</button></td>
+          </tr>`; }).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
     </div>
 
     <div class="rail">
@@ -1046,10 +1282,10 @@ function renderAmPortfolio(){
         <div class="slackmsg">
           <span class="chan">#lab-onboarding · Confident Onboarding</span>
           <b>Onboarding digest — Sept 8</b>
-          <div class="row">Sky Analytics completed <b>Provide your client-facing pricing sheet</b> (8/21)</div>
-          <div class="row">PhytoLab MN raised a request: <b>Can we report two matrices on one COA?</b></div>
-          <div class="row">Montana Analytical entered <b>Validation &amp; Go-Live</b></div>
-          <div class="row">⚠ ChRi Laboratories — no activity for 9 days</div>
+          <div class="row">Northgate Analytical completed <b>Provide your client-facing pricing sheet</b> (8/21)</div>
+          <div class="row">Birchwood Labs raised a request: <b>Can we report two matrices on one COA?</b></div>
+          <div class="row">Clearwater Testing Co entered <b>Validation &amp; Go-Live</b></div>
+          <div class="row">⚠ Ridgeline Scientific — no activity for 9 days</div>
         </div>
       </div>
     </div>
@@ -1075,6 +1311,7 @@ function renderAmLab(){
     <div style="display:flex;gap:10px">
       <button class="btn-ghost" onclick="openLabSettings('${l.slug}')">Lab settings</button>
       <button class="btn-ghost" onclick="openAdd('am')">+ Add task</button>
+      <button class="btn-ghost" style="color:var(--coral)" onclick="openArchiveLab('${l.slug}')">Archive lab</button>
     </div>
   </div>
   ${mineToWrite ? '' : `<div class="note">You are not the assigned AM for this lab (${esc(l.am)} is). You have read access; any change you make here is recorded in the activity log.</div>`}
@@ -1107,6 +1344,9 @@ function renderAmLab(){
       <div class="card">
         <span class="overline">Linked records</span>
         <p style="font-size:13.5px"><a href="#" onclick="return false">HubSpot onboarding ticket →</a><span class="slug">Stored as an ID; link-out only in v1.</span></p>
+        <p style="font-size:13.5px;margin-top:10px">${l.linearUrl
+          ? `<a href="${esc(l.linearUrl)}" target="_blank" rel="noopener">Onboarding project in Linear →</a><span class="slug">${esc(l.linearUrl)}</span>`
+          : '<span class="muted">No Linear project linked. Add one in Lab settings.</span>'}</p>
       </div>
     </div>
   </div>`;
@@ -1144,6 +1384,134 @@ function toggle(id){
   render();
   if(openId){ const e = document.getElementById(openId); if(e) e.setAttribute('data-open','1'); }
 }
+/* ---------- v3: task deletion ----------
+   The rule, in one place so both the button and the handler read it the same way:
+   an AM may delete any task; a lab may delete only the ones the lab itself raised. */
+function canDeleteTask(t, mode){ return !!t && (mode==='am' || t.source==='lab-created'); }
+/* The confirmation is built into the page rather than using window.confirm, which is
+   suppressed in an embedded frame — there it returns false and the delete would simply
+   never happen, with nothing on screen to say why. */
+function openDeleteTask(id, mode){
+  const found = findTask(id); if(!found) return;
+  const {t} = found;
+  if(!canDeleteTask(t, mode)) return;
+  document.getElementById('modal').innerHTML = `
+    <h2>Delete this task?</h2>
+    <p>“${esc(t.title)}” will be removed from the checklist along with its comments. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button type="button" class="btn-coral" onclick="deleteTask('${t.id}','${mode}')">Delete task</button>
+    </div>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+function deleteTask(id, mode){
+  const found = findTask(id); if(!found) return;
+  const {t, slug} = found;
+  if(!canDeleteTask(t, mode)) return;      /* belt and braces — the button is already hidden */
+  closeModal();
+  const l = LABS.find(x=>x.slug===slug);
+  TASKS[slug] = TASKS[slug].filter(x => x.id !== id);
+  ACTIVITY.unshift({kind:'deleted', lab:l?l.name:'',
+    txt:`<b>${esc(mode==='lab' ? 'The lab' : STATE.currentUser)}</b> deleted “${esc(t.title)}”`, when:'just now'});
+  render();
+}
+
+/* ---------- v3: Linear ticket links (Confident side only) ---------- */
+/* ENG-4417 out of .../issue/ENG-4417/some-slug — falls back to the raw URL. */
+function linearLabel(url){
+  const m = String(url).match(/\/issue\/([A-Z0-9]+-\d+)/i);
+  return m ? m[1] : String(url).replace(/^https?:\/\//,'').slice(0,48);
+}
+function addLinear(ev, id){
+  ev.preventDefault();
+  const input = ev.target.querySelector('input[name="url"]');
+  const v = (input.value||'').trim(); if(!v) return;
+  const {t} = findTask(id) || {};
+  if(!t) return;
+  if(!Array.isArray(t.linearUrls)) t.linearUrls = [];
+  if(!t.linearUrls.includes(v)) t.linearUrls.push(v);
+  input.value = '';
+  render();
+  const e = document.getElementById('task-'+id); if(e) e.setAttribute('data-open','1');
+}
+function removeLinear(id, i){
+  const {t} = findTask(id) || {};
+  if(!t || !Array.isArray(t.linearUrls)) return;
+  t.linearUrls.splice(i,1);
+  render();
+  const e = document.getElementById('task-'+id); if(e) e.setAttribute('data-open','1');
+}
+
+/* ---------- v3: Request help ----------
+   Opens the lab's mail client against the shared support inbox, prefilled with the
+   lab, and with the phase and task when it was raised from a specific task. Nothing
+   is recorded portal-side — a reply comes back by email, not into the checklist. */
+function helpMailto(l, t){
+  const subject = t ? `[${l.name}] onboarding help — ${t.title}` : `[${l.name}] onboarding help`;
+  const ph = t ? phaseOfLab(l, t.phase) : null;
+  const body = t
+    ? `Lab: ${l.name}\nPhase: ${ph ? 'Phase '+ph.order+' — '+ph.name : '—'}\nTask: ${t.title}\n\nWhat we need help with:\n`
+    : `Lab: ${l.name}\n\nWhat we need help with:\n`;
+  return 'mailto:'+SUPPORT_EMAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+
+/* ---------- v3: archiving a lab ----------
+   Archive rather than destroy. The record stays readable for a later business review
+   or a dispute; it just leaves the portfolio. AM-only, and the confirm asks for the
+   lab's name so it cannot be done by a stray click. */
+function openArchiveLab(slug){
+  const l = LABS.find(x=>x.slug===slug); if(!l) return;
+  document.getElementById('modal').innerHTML = `
+    <h2>Archive ${esc(l.name)}?</h2>
+    <p>The lab leaves the portfolio and both scope views. Its checklist, comments, internal notes
+       and activity are all kept, and you can restore it from Archived labs at the bottom of the portfolio.</p>
+    <form onsubmit="submitArchiveLab(event,'${slug}')">
+      <div class="field">
+        <label class="overline">Type the lab name to confirm</label>
+        <input name="confirm" autocomplete="off" placeholder="${esc(l.name)}">
+      </div>
+      <span class="savedflag" id="archerr"></span>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-coral">Archive lab</button>
+      </div>
+    </form>`;
+  document.getElementById('scrim').setAttribute('data-open','1');
+}
+function submitArchiveLab(ev, slug){
+  ev.preventDefault();
+  const l = LABS.find(x=>x.slug===slug); if(!l) return;
+  const typed = (ev.target.elements.confirm.value||'').trim();
+  const err = document.getElementById('archerr');
+  if(typed !== l.name){ if(err) err.textContent = 'That does not match the lab name.'; return; }
+  l.archived = true;
+  ACTIVITY.unshift({kind:'archived', lab:l.name,
+    txt:`<b>${esc(STATE.currentUser)}</b> archived ${esc(l.name)}`, when:'just now'});
+  closeModal();
+  STATE.amLab = null;
+  render({top:true});
+}
+function restoreLab(slug){
+  const l = LABS.find(x=>x.slug===slug); if(!l) return;
+  l.archived = false;
+  ACTIVITY.unshift({kind:'created', lab:l.name,
+    txt:`<b>${esc(STATE.currentUser)}</b> restored ${esc(l.name)}`, when:'just now'});
+  render();
+}
+
+/* ---------- v3: AM sentiment on a finished onboarding ---------- */
+const SENTIMENTS = [
+  {key:'',        label:'Not rated'},
+  {key:'smooth',  label:'Went smoothly'},
+  {key:'mixed',   label:'Some friction'},
+  {key:'rough',   label:'Rough — worth a retro'}
+];
+function setSentiment(slug, v){
+  const l = LABS.find(x=>x.slug===slug); if(!l) return;
+  l.sentiment = v;
+  saveState();   /* no re-render: the select already shows it */
+}
+
 function openTask(id){
   const e = document.getElementById('task-'+id);
   if(!e) return false;
@@ -1169,10 +1537,10 @@ function openAdd(mode){
   const slug = mode==='lab' ? STATE.labSlug : STATE.amLab;
   const l = LABS.find(x=>x.slug===slug);
   document.getElementById('modal').innerHTML = `
-    <h2>${mode==='lab' ? 'Add a task or request help' : 'Add a task for '+esc(l.name)}</h2>
+    <h2>${mode==='lab' ? 'Add a task' : 'Add a task for '+esc(l.name)}</h2>
     <p>${mode==='lab'
-        ? 'Add something to your own list, or raise a request for the Confident team. Either way it becomes tracked work instead of a message that scrolls away.'
-        : 'Assign this to the lab or to yourself. The lab sees it on their checklist immediately.'}</p>
+        ? 'Add something to your own list, or assign it to the Confident team. Dates come from the phase you put it in. If you just need a hand with something, use Request help instead.'
+        : 'Assign this to the lab or to yourself. The lab sees it on their checklist immediately. The phase carries the date.'}</p>
     <form onsubmit="submitAdd(event,'${mode}','${slug}')">
       <div class="field">
         <label class="overline">Task title</label>
@@ -1184,7 +1552,8 @@ function openAdd(mode){
       </div>
       <div class="field">
         <label class="overline">Phase</label>
-        <select name="phase">${phasesFor(l).map(p=>`<option value="${p.id}">Phase ${p.order} — ${esc(p.name)}</option>`).join('')}</select>
+        <select name="phase">${phasesFor(l).map(p=>{const d=phaseDue(l,p);
+          return `<option value="${p.id}">Phase ${p.order} — ${esc(p.name)}${d?' (due '+d+')':''}</option>`;}).join('')}</select>
       </div>
       <div class="field">
         <label class="overline">Who owns it</label>
@@ -1193,10 +1562,6 @@ function openAdd(mode){
             ? '<option value="lab">Our lab</option><option value="confident">Confident (this is a request for help)</option>'
             : '<option value="lab">The lab</option><option value="confident">Us (Confident)</option>'}
         </select>
-      </div>
-      <div class="field">
-        <label class="overline">Due date</label>
-        <input type="date" name="due" value="2026-09-15">
       </div>
       <div class="modal-actions">
         <button type="button" class="btn-ghost" onclick="closeModal()">Cancel</button>
@@ -1220,10 +1585,10 @@ function submitAdd(ev,mode,slug){
     desc:f.desc.value.trim() || 'No further detail provided.',
     phase:f.phase.value, ownerSide:side,
     assignee: side==='lab' ? l.name+' team' : l.am,
-    status:'Not started', dueDate:f.due.value || '2026-09-15', completedAt:null,
+    status:'Not started', completedAt:null,
     source: mode==='lab' ? 'lab-created' : 'am-created',
     createdBy: mode==='lab' ? 'You ('+l.name+')' : STATE.currentUser+' (Account Manager)',
-    order:100+TASKS[slug].length, help:[], docs:[], comments:[]
+    order:100+TASKS[slug].length, help:[], docs:[], linearUrls:[], comments:[]
   });
   ACTIVITY.unshift({
     kind:'created', lab:l.name,
@@ -1309,24 +1674,35 @@ const slugify = s => s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/
    start date, and the template's help/docs are KEYS that have to be mapped through
    HELP/DOCS to become the objects the renderer expects. A blank template gives [] —
    a lab with no tasks yet, which the empty states already handle. */
+/* v3: the template owns the phase list, and taskPhase records any task that was moved
+   to a different phase within this template. Ordering follows the template's phases, and
+   a task whose phase no longer exists in the template falls into the first phase rather
+   than vanishing into a phase nothing renders. Dates are not set here any more — they
+   belong to the phase. */
+function templatePhaseOf(ptmpl, tt){
+  const ids = ptmpl.phases.map(p=>p.id);
+  const want = (ptmpl.taskPhase && ptmpl.taskPhase[tt.id]) || tt.phase;
+  return ids.includes(want) ? want : ids[0];
+}
 function tasksFromTemplate(lab, ptmpl){
   if(!ptmpl) return [];
+  normalizeTemplate(ptmpl);
+  const order = ptmpl.phases.map(p=>p.id);
   const picked = ptmpl.taskIds
     .map(id => TASK_TEMPLATES.find(t => t.id === id))
     .filter(Boolean)
-    .sort((a,b) => PHASES.findIndex(p=>p.id===a.phase) - PHASES.findIndex(p=>p.id===b.phase));
-  const startMs = new Date(lab.start+'T12:00:00Z').getTime();
-  return picked.map((tt,i)=>({
+    .map(tt => ({tt, phase: templatePhaseOf(ptmpl, tt)}))
+    .sort((a,b) => order.indexOf(a.phase) - order.indexOf(b.phase));
+  return picked.map(({tt, phase},i)=>({
     id:'t'+(++TASK_ID),
-    title:tt.title, desc:tt.desc, phase:tt.phase, ownerSide:tt.side,
+    title:tt.title, desc:tt.desc, phase, ownerSide:tt.side,
     assignee: tt.side==='lab' ? lab.name+' team' : lab.am,
     status:'Not started',
-    dueDate: new Date(startMs + (i+1)*4*864e5).toISOString().slice(0,10),
     completedAt:null,
     source:'template', createdBy:'Phase template ('+ptmpl.name+')',
     order:i, help:(tt.help||[]).map(k=>HELP[k]).filter(Boolean),
     docs:(tt.docs||[]).map(k=>DOCS[k]).filter(Boolean),
-    comments:[]
+    linearUrls:[], comments:[]
   }));
 }
 
@@ -1395,6 +1771,12 @@ function openNewLab(){
             ${PHASE_TEMPLATES.map(p=>`<option value="${p.id}">${esc(p.name)} — ${p.taskIds.length} tasks</option>`).join('')}
           </select>
         </div>
+        <div class="field">
+          <label class="overline">Industries tested</label>
+          <div class="tagpick">
+            ${INDUSTRIES.map(x=>`<label class="tagopt"><input type="checkbox" name="industry" value="${esc(x)}"><span>${esc(x)}</span></label>`).join('')}
+          </div>
+        </div>
         <span class="savedflag" id="newlaberr"></span>
       </div>
       <div class="modal-actions">
@@ -1415,6 +1797,8 @@ function submitNewLab(ev){
     if(err) err.textContent = 'That slug is already taken by ' + LABS.find(l=>l.slug===slug).name + '.';
     return;
   }
+  const tmpl = PHASE_TEMPLATES.find(p=>p.id===f.tmpl.value);
+  if(tmpl) normalizeTemplate(tmpl);
   const lab = normalizeLab({
     slug, name:f.name.value.trim(),
     abbrev:f.abbrev.value.trim().toUpperCase(),
@@ -1422,10 +1806,15 @@ function submitNewLab(ev){
     line:f.line.value, tier:f.tier.value,
     am: STATE.me.am.name,
     start: TODAY.toISOString().slice(0,10),
-    done:0, users:[]
+    done:0, users:[],
+    /* The lab takes its own copy of the template's phases — names, order and due
+       offsets — so editing the template later cannot reshape this checklist. */
+    phases: tmpl ? tmpl.phases.map(p=>({...p})) : clonePhases(),
+    phaseNames: tmpl ? {...(tmpl.phaseNames||{})} : {},
+    industries: [...ev.target.querySelectorAll('input[name="industry"]:checked')].map(i=>i.value)
   });
   LABS.push(lab);
-  TASKS[slug] = tasksFromTemplate(lab, PHASE_TEMPLATES.find(p=>p.id===f.tmpl.value));
+  TASKS[slug] = tasksFromTemplate(lab, tmpl);
   ACTIVITY.unshift({kind:'created', lab:lab.name,
     txt:`<b>${esc(STATE.me.am.name)}</b> created ${esc(lab.name)}`, when:'just now'});
   closeModal();
@@ -1451,15 +1840,44 @@ function openLabSettings(slug){
   if(!l) return;
   document.getElementById('modal').innerHTML = `
     <h2>Lab settings — ${esc(l.name)}</h2>
-    <p>Everything here is set for this lab only. Leave a phase name blank to keep the default.</p>
+    <p>Everything here is set for this lab only. Leave a phase name blank to keep the one the template gave it, and leave a date blank to use the date the template implies.</p>
     <form onsubmit="submitLabSettings(event,'${slug}')" class="modal-wide">
       <div class="modal-scroll">
-        <span class="subhead first">Phase names</span>
-        ${PHASES.map(p=>`
-          <div class="field">
-            <label class="overline">Phase ${p.order}</label>
-            <input name="phase-${p.id}" placeholder="${esc(p.name)}" value="${esc(l.phaseNames[p.id]||'')}">
+        <span class="subhead first">Phases</span>
+        <p class="muted" style="font-size:12.5px;margin:-4px 0 10px">
+          Dates belong to phases, not to individual tasks. A blank date falls back to
+          ${esc(l.start)} plus the template's offset. A phase is flagged overdue when its date
+          has passed and it still has unfinished work.</p>
+        ${(l.phases||[]).map((p,i)=>`
+          <div class="field-row">
+            <div class="field">
+              <label class="overline">Phase ${i+1} name</label>
+              <input name="phase-${p.id}" placeholder="${esc(p.name)}" value="${esc(l.phaseNames[p.id]||'')}">
+            </div>
+            <div class="field">
+              <label class="overline">Due date</label>
+              <input type="date" name="due-${p.id}" value="${esc(l.phaseDue[p.id]||'')}"
+                placeholder="${esc(phaseDue(l,p))}">
+              <span class="slug">Template default: ${esc(l.start && typeof p.dueOffset==='number' ? addDays(l.start,p.dueOffset) : 'none')}</span>
+            </div>
           </div>`).join('')}
+
+        <span class="subhead">Industries tested</span>
+        <p class="muted" style="font-size:12.5px;margin:-4px 0 10px">Shown beside the plan in the portfolio table.</p>
+        <div class="tagpick">
+          ${INDUSTRIES.map(x=>`<label class="tagopt"><input type="checkbox" name="industry" value="${esc(x)}" ${(l.industries||[]).includes(x)?'checked':''}><span>${esc(x)}</span></label>`).join('')}
+        </div>
+
+        <span class="subhead">Status and links</span>
+        <div class="field">
+          <label class="overline">Status update for other AMs</label>
+          <input name="statusNote" value="${esc(l.statusNote||'')}" placeholder="e.g. Lab is waiting to hear back from regulators">
+          <span class="slug">Appears under the lab name in the portfolio. Visible to every AM, never to the lab.</span>
+        </div>
+        <div class="field">
+          <label class="overline">Onboarding project in Linear</label>
+          <input name="linearUrl" type="url" value="${esc(l.linearUrl||'')}" placeholder="https://linear.app/confident/project/…">
+        </div>
 
         <span class="subhead">Document bundle</span>
         <p class="muted" style="font-size:12.5px;margin:-4px 0 10px">
@@ -1498,13 +1916,21 @@ function submitLabSettings(ev, slug){
   const f = ev.target.elements;
 
   /* Blank means "use the default", so drop the key rather than storing an empty string —
-     phasesFor only overrides on a truthy value and this keeps the saved state honest. */
-  const names = {};
-  PHASES.forEach(p => {
-    const v = (f['phase-'+p.id].value || '').trim();
+     phasesFor only overrides on a truthy value and this keeps the saved state honest.
+     Phase dates behave the same way: a blank clears the override back to the template's offset. */
+  const names = {}, dues = {};
+  (l.phases||[]).forEach(p => {
+    const v = ((f['phase-'+p.id] || {}).value || '').trim();
     if(v && v !== p.name) names[p.id] = v;
+    const d = ((f['due-'+p.id] || {}).value || '').trim();
+    if(d) dues[p.id] = d;
   });
   l.phaseNames = names;
+  l.phaseDue   = dues;
+
+  l.industries = [...ev.target.querySelectorAll('input[name="industry"]:checked')].map(i=>i.value);
+  l.statusNote = ((f.statusNote||{}).value || '').trim();
+  l.linearUrl  = ((f.linearUrl ||{}).value || '').trim();
 
   /* Repeated same-named inputs come back as a RadioNodeList, a bare element, or nothing
      at all depending on how many there are. querySelectorAll is the same shape every time. */
@@ -1542,12 +1968,13 @@ function openTemplates(){
       <div class="modal-scroll">
         <div class="subhead first">Phase templates</div>
         ${PHASE_TEMPLATES.map(p => {
-          const renames = Object.keys(p.phaseNames || {}).length;
+          normalizeTemplate(p);
+          const nph = p.phases.length;
           return `<div class="tmplcard">
             <div>
               <b>${esc(p.name)}</b>
               <div class="muted" style="font-size:12px">
-                ${esc(p.line)} · ${esc(p.tier)} · ${p.taskIds.length} task${p.taskIds.length===1?'':'s'}${renames ? ' · renames '+renames+' phase'+(renames===1?'':'s') : ''}
+                ${esc(p.line)} · ${esc(p.tier)} · ${nph} phase${nph===1?'':'s'} · ${p.taskIds.length} task${p.taskIds.length===1?'':'s'}
               </div>
             </div>
             <button class="btn-ghost" onclick="openPhaseTemplate('${p.id}')">Edit</button>
@@ -1641,52 +2068,124 @@ function deleteTaskTemplate(id){
   openTemplates();
 }
 
-function openPhaseTemplate(id){
+/* v3: adding or removing a phase changes which phases every task row can be moved to,
+   so those two actions re-open the modal from a draft read straight out of the form
+   rather than patching the DOM in place and letting the selects go stale. */
+let PH_ID = 100;
+function readPhaseTemplateForm(){
+  const form = document.getElementById('modal').querySelector('form');
+  if(!form) return null;
+  const f = form.elements;
+  const phases = [...form.querySelectorAll('.phrow')].map((row,i) => ({
+    id: row.dataset.pid,
+    name: (row.querySelector('[data-k="name"]').value || '').trim() || ('Phase '+(i+1)),
+    blurb: row.dataset.blurb || '',
+    order: i+1,
+    dueOffset: Number(row.querySelector('[data-k="off"]').value) || 0
+  }));
+  const taskPhase = {};
+  [...form.querySelectorAll('select[data-tt]')].forEach(sel => { taskPhase[sel.dataset.tt] = sel.value; });
+  return {
+    name:(f.name.value||'').trim(), line:f.line.value, tier:f.tier.value,
+    phases, taskPhase,
+    taskIds:[...form.querySelectorAll('input[name="task"]:checked')].map(i=>i.value)
+  };
+}
+function addTemplatePhase(id){
+  const d = readPhaseTemplateForm(); if(!d) return;
+  d.phases.push({id:'px'+(++PH_ID), name:'New phase', blurb:'', order:d.phases.length+1, dueOffset:(d.phases.length+1)*21});
+  openPhaseTemplate(id, d);
+}
+function removeTemplatePhase(id, pid){
+  const d = readPhaseTemplateForm(); if(!d) return;
+  if(d.phases.length <= 1) return;
+  /* A phase cannot take its tasks down with it. Everything selected in this phase has
+     to be moved somewhere else first — which is what the per-task Phase picker is for. */
+  const held = d.taskIds.filter(tid => d.taskPhase[tid] === pid);
+  if(held.length){
+    const err = document.getElementById('pterr');
+    if(err) err.textContent = held.length+' task'+(held.length>1?'s are':' is')+' still in that phase. Move them to another phase first.';
+    return;
+  }
+  d.phases = d.phases.filter(p => p.id !== pid);
+  openPhaseTemplate(id, d);
+}
+
+function openPhaseTemplate(id, draft){
   const p = PHASE_TEMPLATES.find(x => x.id === id);
-  const picked = p ? p.taskIds : [];
+  if(p) normalizeTemplate(p);
+  const d = draft || (p
+    ? {name:p.name, line:p.line, tier:p.tier, phases:p.phases.map(x=>({...x})),
+       taskPhase:{...p.taskPhase}, taskIds:p.taskIds.slice()}
+    : {name:'', line:'LIMS', tier:'Starter', phases:clonePhases(), taskPhase:{}, taskIds:[]});
+  const picked = d.taskIds;
   const over = (p && p.phaseNames) || {};
+  const phaseOfTT = tt => {
+    const want = d.taskPhase[tt.id] || tt.phase;
+    return d.phases.some(x=>x.id===want) ? want : d.phases[0].id;
+  };
   document.getElementById('modal').innerHTML = `
     <form class="modal-wide" onsubmit="submitPhaseTemplate(event, '${id}')">
       <h3>${p ? 'Edit phase template' : 'New phase template'}</h3>
       <div class="modal-scroll">
         <div class="field">
           <label class="overline" for="pt-name">Template name</label>
-          <input id="pt-name" name="name" required value="${p ? esc(p.name) : ''}" placeholder="LIMS — Pro">
+          <input id="pt-name" name="name" required value="${esc(d.name)}" placeholder="LIMS — Pro">
         </div>
         <div class="field-row">
           <div class="field">
             <label class="overline" for="pt-line">Product</label>
             <select id="pt-line" name="line">
-              <option value="LIMS" ${p && p.line==='LIMS' ? 'selected':''}>LIMS</option>
-              <option value="Network Only" ${p && p.line==='Network Only' ? 'selected':''}>Network Only</option>
+              <option value="LIMS" ${d.line==='LIMS' ? 'selected':''}>LIMS</option>
+              <option value="Network Only" ${d.line==='Network Only' ? 'selected':''}>Network Only</option>
             </select>
           </div>
           <div class="field">
             <label class="overline" for="pt-tier">Plan</label>
             <select id="pt-tier" name="tier">
               ${['Starter','Pro','Premium','Basic'].map(x =>
-                `<option value="${x}" ${p && p.tier===x ? 'selected':''}>${x}</option>`).join('')}
+                `<option value="${x}" ${d.tier===x ? 'selected':''}>${x}</option>`).join('')}
             </select>
           </div>
         </div>
 
-        <div class="subhead">Phase names</div>
-        <p class="muted" style="font-size:12.5px;margin-bottom:10px">Leave blank to use the default.</p>
-        ${PHASES.map(ph => `
-          <div class="field">
-            <label class="overline" for="pt-${ph.id}">${esc(ph.name)}</label>
-            <input id="pt-${ph.id}" name="phase-${ph.id}" value="${esc(over[ph.id] || '')}" placeholder="${esc(ph.name)}">
-          </div>`).join('')}
+        <div class="subhead">Phases</div>
+        <p class="muted" style="font-size:12.5px;margin-bottom:10px">
+          A lab built from this template takes its own copy of these phases, so editing them
+          here never reshapes a lab that already exists. <b>Due in</b> is days from the lab's
+          start date; an account manager can override any date per lab in Lab settings.</p>
+        <div id="phrows">
+          ${d.phases.map((ph,i) => `
+            <div class="phrow" data-pid="${esc(ph.id)}" data-blurb="${esc(ph.blurb||'')}">
+              <span class="phnum">${i+1}</span>
+              <input data-k="name" value="${esc(ph.name)}" placeholder="Phase name" aria-label="Phase ${i+1} name">
+              <label class="offlab">Due in
+                <input data-k="off" type="number" min="0" max="999" value="${Number(ph.dueOffset)||0}" aria-label="Phase ${i+1} due offset in days">
+                days</label>
+              <button type="button" class="xbtn" onclick="removeTemplatePhase('${id}','${esc(ph.id)}')"
+                aria-label="Remove phase" ${d.phases.length<=1?'disabled':''}>&times;</button>
+            </div>`).join('')}
+        </div>
+        <button type="button" class="btn-ghost" style="margin-top:8px" onclick="addTemplatePhase('${id}')">+ Add phase</button>
+        <span class="savedflag" id="pterr"></span>
 
         <div class="subhead">Tasks in this template</div>
-        ${PHASES.map(ph => {
-          const rows = TASK_TEMPLATES.filter(t => t.phase === ph.id);
+        <p class="muted" style="font-size:12.5px;margin-bottom:10px">
+          Tick what this template starts a lab with. Use the phase picker on a row to move
+          a task into a different phase for this template only.</p>
+        ${d.phases.map(ph => {
+          const rows = TASK_TEMPLATES.filter(t => phaseOfTT(t) === ph.id);
           return `<div class="overline" style="margin:14px 0 6px">${esc(ph.name)}</div>
           ${rows.length ? rows.map(t => `
-            <label class="rowitem">
-              <input type="checkbox" name="task" value="${t.id}" ${picked.includes(t.id) ? 'checked':''}>
-              <span>${esc(t.title)} <span class="muted">· ${t.side === 'lab' ? 'Lab' : 'Confident'}</span></span>
-            </label>`).join('')
+            <div class="rowitem taskrow">
+              <label class="taskpick">
+                <input type="checkbox" name="task" value="${t.id}" ${picked.includes(t.id) ? 'checked':''}>
+                <span>${esc(t.title)} <span class="muted">· ${t.side === 'lab' ? 'Lab' : 'Confident'}</span></span>
+              </label>
+              <select data-tt="${t.id}" aria-label="Phase for ${esc(t.title)}">
+                ${d.phases.map(x=>`<option value="${esc(x.id)}"${x.id===ph.id?' selected':''}>${esc(x.name)}</option>`).join('')}
+              </select>
+            </div>`).join('')
             : '<div class="emptyhint">No task templates in this phase yet.</div>'}`;
         }).join('')}
       </div>
@@ -1701,20 +2200,18 @@ function openPhaseTemplate(id){
 
 function submitPhaseTemplate(ev, id){
   ev.preventDefault();
-  const f = ev.target.elements;
-  const names = {};
-  PHASES.forEach(ph => {
-    const v = (f['phase-'+ph.id].value || '').trim();
-    if(v && v !== ph.name) names[ph.id] = v;
-  });
+  const d = readPhaseTemplateForm();
+  if(!d) return;
+  /* Phase names now live on the phase rows themselves, so phaseNames keeps only what a
+     lab-level rename would need and is no longer the place the template stores its names. */
   const patch = {
-    name:f.name.value.trim(), line:f.line.value, tier:f.tier.value,
-    phaseNames:names,
-    taskIds:[...ev.target.querySelectorAll('input[name="task"]:checked')].map(i => i.value)
+    name:d.name, line:d.line, tier:d.tier,
+    phases:d.phases, taskPhase:d.taskPhase, phaseNames:{},
+    taskIds:d.taskIds
   };
   const existing = PHASE_TEMPLATES.find(x => x.id === id);
-  if(existing) Object.assign(existing, patch);
-  else PHASE_TEMPLATES.push({id:'pt'+(++PTMPL_ID), ...patch});
+  if(existing) Object.assign(existing, normalizeTemplate(patch));
+  else PHASE_TEMPLATES.push(normalizeTemplate({id:'pt'+(++PTMPL_ID), ...patch}));
   saveState();
   openTemplates();
 }

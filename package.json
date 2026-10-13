@@ -1,0 +1,11 @@
+{
+  "name": "confident-onboarding",
+  "private": true,
+  "description": "Prototype of the Confident lab onboarding portal. The app is index.html and has no build step; this file exists only so the smoke test has a dependency to install.",
+  "scripts": {
+    "test": "node verify.js"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

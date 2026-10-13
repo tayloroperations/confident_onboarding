@@ -133,7 +133,9 @@ w.openAdd('lab');
 const modal = d.getElementById('modal');
 t('add-task modal populates', modal && modal.querySelector('form'));
 t('modal has all fields',
-  modal && ['title','desc','phase','side','due'].every(n => modal.querySelector(`[name="${n}"]`)));
+  modal && ['title','desc','phase','side'].every(n => modal.querySelector(`[name="${n}"]`)));
+t('v3: add-task modal no longer asks for a due date',
+  modal && !modal.querySelector('[name="due"]'));
 const form = modal.querySelector('form');
 form.querySelector('[name="title"]').value = 'Verification smoke-test task';
 const countBefore = TASKS[slug].length;
@@ -377,19 +379,28 @@ t('editing updates in place rather than appending',
 w.openPhaseTemplate('');
 const ptf = d.getElementById('modal').querySelector('form');
 t('phase template form has name/product/plan', ['name','line','tier'].every(n => ptf.elements[n]));
-t('phase template form has a rename box per phase',
-  PHASES.every(p => ptf.elements['phase-' + p.id]));
+t('phase template form has an editable row per phase',
+  ptf.querySelectorAll('.phrow').length === PHASES.length,
+  ptf.querySelectorAll('.phrow').length + ' rows');
+t('each phase row carries a name and a due offset',
+  [...ptf.querySelectorAll('.phrow')].every(r =>
+    r.querySelector('[data-k="name"]') && r.querySelector('[data-k="off"]')));
 t('phase template form lists task templates to pick',
   ptf.querySelectorAll('input[name="task"]').length === w.eval('TASK_TEMPLATES.length'));
+t('every task row offers a phase picker',
+  ptf.querySelectorAll('select[data-tt]').length === w.eval('TASK_TEMPLATES.length'));
 ptf.elements.name.value = 'Smoke phase template';
-ptf.elements['phase-p4'].value = 'Go Live';
+[...ptf.querySelectorAll('.phrow')].pop().querySelector('[data-k="name"]').value = 'Go Live';
 ptf.querySelector(`input[name="task"][value="${newTT.id}"]`).checked = true;
 const ptBefore = w.eval('PHASE_TEMPLATES.length');
 w.submitPhaseTemplate({ preventDefault(){}, target: ptf }, '');
 t('submitPhaseTemplate creates', w.eval('PHASE_TEMPLATES.length') === ptBefore + 1);
 const newPT = w.eval('PHASE_TEMPLATES[PHASE_TEMPLATES.length-1]');
 t('phase template keeps its task picks', newPT.taskIds.includes(newTT.id));
-t('phase template keeps its phase renames', newPT.phaseNames.p4 === 'Go Live');
+t('phase template keeps its phase renames',
+  newPT.phases[newPT.phases.length-1].name === 'Go Live');
+t('phase template stores a due offset per phase',
+  newPT.phases.every(p => typeof p.dueOffset === 'number'));
 
 w.deleteTaskTemplate(newTT.id);
 t('deleteTaskTemplate removes it', w.eval('TASK_TEMPLATES.length') === ttBefore);
@@ -437,6 +448,304 @@ const modalMissing = [];
 });
 t('all modal on* handlers defined', modalMissing.length === 0, modalMissing.join(', '));
 w.closeModal();
+
+
+/* =====================================================================
+   v3 checks
+   The V3 pass moved dates from tasks to phases, gave phases to templates,
+   and added deletion. Each of those changes a rule rather than adding a
+   widget, so these drive the rule from both sides — the allowed case and
+   the refused one — rather than checking that a button exists.
+   ===================================================================== */
+
+// Deletion confirms in-page rather than through window.confirm, which an embedded
+// frame suppresses — so these drive the real modal.
+
+// --- dates moved off tasks and onto phases ---
+t('v3: no task anywhere still carries a dueDate',
+  LABS.every(l => (TASKS[l.slug]||[]).every(x => x.dueDate === undefined)));
+t('v3: every task carries a linearUrls array',
+  LABS.every(l => (TASKS[l.slug]||[]).every(x => Array.isArray(x.linearUrls))));
+t('v3: every lab carries the phase + v3 config slots', LABS.every(l =>
+  Array.isArray(l.phases) && l.phases.length && l.phaseDue && typeof l.phaseDue === 'object' &&
+  Array.isArray(l.industries) && typeof l.statusNote === 'string' &&
+  typeof l.linearUrl === 'string' && typeof l.sentiment === 'string' &&
+  typeof l.archived === 'boolean'));
+t('v3: every phase carries a numeric dueOffset',
+  LABS.every(l => l.phases.every(p => typeof p.dueOffset === 'number')));
+
+const L0 = LABS.find(l => l.slug === 'northgate-analytical');
+const P0 = w.eval('phasesFor(LABS.find(l=>l.slug==="northgate-analytical"))')[0];
+t('v3: phaseDue computes from the lab start plus the offset',
+  w.eval(`phaseDue(LABS.find(l=>l.slug==="northgate-analytical"), phasesFor(LABS.find(l=>l.slug==="northgate-analytical"))[0])`)
+    === new Date(new Date(L0.start+'T12:00:00Z').getTime() + P0.dueOffset*864e5).toISOString().slice(0,10));
+L0.phaseDue[P0.id] = '2099-01-01';
+t('v3: a per-lab override beats the computed date',
+  w.eval(`phaseDue(LABS.find(l=>l.slug==="northgate-analytical"), phasesFor(LABS.find(l=>l.slug==="northgate-analytical"))[0])`) === '2099-01-01');
+t('v3: a future phase date is not overdue',
+  w.eval(`phaseOverdue(LABS.find(l=>l.slug==="northgate-analytical"), phasesFor(LABS.find(l=>l.slug==="northgate-analytical"))[0])`) === false);
+L0.phaseDue[P0.id] = '2020-01-01';
+const p0Open = (TASKS['northgate-analytical']||[]).some(x => x.phase === P0.id && x.status !== 'Done');
+t('v3: a past phase date with open work is overdue',
+  w.eval(`phaseOverdue(LABS.find(l=>l.slug==="northgate-analytical"), phasesFor(LABS.find(l=>l.slug==="northgate-analytical"))[0])`) === p0Open,
+  p0Open ? 'phase has open work' : 'phase already complete, correctly not flagged');
+// a phase with nothing left open is never overdue, however old its date
+(TASKS['northgate-analytical']||[]).filter(x => x.phase === P0.id).forEach(x => { x.status = 'Done'; });
+t('v3: a finished phase is never overdue, however old the date',
+  w.eval(`phaseOverdue(LABS.find(l=>l.slug==="northgate-analytical"), phasesFor(LABS.find(l=>l.slug==="northgate-analytical"))[0])`) === false);
+delete L0.phaseDue[P0.id];
+
+// --- the rendered surfaces ---
+w.setRole('lab'); STATE.labSlug = 'northgate-analytical'; w.render();
+t('v3: task rows no longer print a due date',
+  !/class="task-date">Due/.test(app.innerHTML));
+t('v3: the only "Due" on the page is the phase header',
+  (app.innerHTML.match(/>Due \d{4}-/g)||[]).length ===
+  (app.innerHTML.match(/class="phase-due[^"]*">Due \d{4}-/g)||[]).length);
+t('v3: the phase header prints the date instead',
+  /class="phase-due/.test(app.innerHTML));
+t('v3: lab view splits Add task from Request help',
+  app.innerHTML.includes('+ Add task') && app.innerHTML.includes('Request help'));
+t('v3: Request help is a mailto to the support inbox',
+  /href="mailto:support@confidentlims\.com\?subject=/.test(app.innerHTML));
+t('v3: the per-task help link carries the task as context',
+  /Request help with this task/.test(app.innerHTML));
+
+// --- lab links ---
+const links = w.eval('LAB_LINKS(LABS.find(l=>l.slug==="northgate-analytical"))');
+t('v3: lab login points at app.confidentlims.com',
+  links.some(x => x.url === 'https://app.confidentlims.com/'));
+t('v3: pricing link added', links.some(x => x.url === 'https://www.confidentlims.com/pricing'));
+t('v3: API docs link added', links.some(x => x.url === 'https://api.confidentlims.com/v0/docs/'));
+t('v3: the templated links substitute the lab slug, not the placeholder',
+  links.some(x => /redirectToPath=orders\/new\/samples\?lab=northgate-analytical$/.test(x.url)) &&
+  links.some(x => /login\?lab=northgate-analytical$/.test(x.url)) &&
+  !links.some(x => /labslug/.test(x.url)));
+
+// --- deletion: the rule, from both sides ---
+const tmplTask = TASKS['northgate-analytical'].find(x => x.source === 'template');
+const ownTask  = TASKS['northgate-analytical'].find(x => x.source === 'lab-created');
+t('v3: a lab may not delete a template task', w.canDeleteTask(tmplTask, 'lab') === false);
+t('v3: a lab may delete a task it raised itself', w.canDeleteTask(ownTask, 'lab') === true);
+t('v3: an AM may delete anything', w.canDeleteTask(tmplTask, 'am') === true);
+const cntBefore = TASKS['northgate-analytical'].length;
+w.deleteTask(tmplTask.id, 'lab');
+t('v3: the lab-side delete is refused in the handler too, not just the UI',
+  TASKS['northgate-analytical'].length === cntBefore);
+w.deleteTask(ownTask.id, 'lab');
+t('v3: the lab-side delete goes through for its own task',
+  TASKS['northgate-analytical'].length === cntBefore - 1 &&
+  !TASKS['northgate-analytical'].some(x => x.id === ownTask.id));
+t('v3: a deletion is logged to ACTIVITY', g('ACTIVITY')[0].kind === 'deleted');
+// the confirmation is page UI, not window.confirm (which an embedded viewer suppresses)
+t('v3: the page never calls window.confirm', !/[^.\w]confirm\s*\(/.test(html));
+const delTask = TASKS['northgate-analytical'].find(x => x.source === 'template');
+w.openDeleteTask(delTask.id, 'am');
+const delModal = d.getElementById('modal');
+t('v3: the delete confirmation is rendered in the page',
+  delModal.innerHTML.includes('Delete this task?') && delModal.innerHTML.includes(delTask.title));
+t('v3: the confirmation offers a way out', /onclick="closeModal\(\)"/.test(delModal.innerHTML));
+// clear the modal first, or the previous dialog's markup would be read as this one's
+w.closeModal(); d.getElementById('modal').innerHTML = '';
+w.openDeleteTask(TASKS['northgate-analytical'].find(x => x.source === 'template').id, 'lab');
+t('v3: the lab side never even opens the confirmation for a template task',
+  d.getElementById('modal').innerHTML === '');
+w.closeModal();
+w.setRole('am'); w.openAmLab('northgate-analytical');
+t('v3: the lab view hides the delete control on template tasks',
+  (() => { w.setRole('lab'); w.render();
+    const n = (app.innerHTML.match(/task-del/g)||[]).length;
+    const own = TASKS['northgate-analytical'].filter(x => x.source === 'lab-created').length;
+    return n === own; })(), 'one control per lab-raised task');
+w.setRole('am'); w.openAmLab('northgate-analytical');
+t('v3: the AM view offers a delete control on every task',
+  (app.innerHTML.match(/task-del/g)||[]).length === TASKS['northgate-analytical'].length);
+
+// --- Linear ticket links, Confident side only ---
+const lt = TASKS['northgate-analytical'][0];
+const lf = d.createElement('form');
+const lu = d.createElement('input'); lu.name = 'url';
+lu.value = 'https://linear.app/confident/issue/ENG-9001/smoke'; lf.appendChild(lu);
+w.addLinear({preventDefault(){}, target: lf}, lt.id);
+t('v3: addLinear attaches the ticket', lt.linearUrls.includes('https://linear.app/confident/issue/ENG-9001/smoke'));
+t('v3: the ticket renders by its identifier, not the raw URL',
+  w.eval(`linearLabel("https://linear.app/confident/issue/ENG-9001/smoke")`) === 'ENG-9001');
+t('v3: the AM view shows the linked ticket', app.innerHTML.includes('ENG-9001'));
+w.setRole('lab'); STATE.labSlug = 'northgate-analytical'; w.render();
+t('v3: the lab view never shows a Linear ticket', !app.innerHTML.includes('ENG-9001'));
+w.setRole('am'); w.openAmLab('northgate-analytical');
+w.removeLinear(lt.id, lt.linearUrls.indexOf('https://linear.app/confident/issue/ENG-9001/smoke'));
+t('v3: removeLinear detaches it', !lt.linearUrls.includes('https://linear.app/confident/issue/ENG-9001/smoke'));
+
+// --- portfolio: tags, status note, Linear project ---
+w.setRole('am'); STATE.amLab = null; w.setScope('all'); w.render();
+t('v3: industry tags render in the portfolio', app.innerHTML.includes('class="tag"'));
+t('v3: the status note renders under the lab name',
+  app.innerHTML.includes('Waiting on a regulator response about the new matrix rule'));
+t('v3: the Linear project link renders in the portfolio', app.innerHTML.includes('linearicon'));
+t('v3: the overdue chip names the phase rather than counting tasks',
+  !/\d+ overdue<\/span>/.test(app.innerHTML));
+w.setRole('lab'); STATE.labSlug = 'clearwater-testing'; w.render();
+t('v3: a status note never reaches the lab side',
+  !app.innerHTML.includes('Waiting on a regulator response about the new matrix rule'));
+
+// --- AM sentiment on a finished onboarding ---
+w.setRole('am'); STATE.amLab = null; w.render();
+t('v3: completed labs offer a sentiment picker', app.innerHTML.includes('class="sentiment"'));
+w.setSentiment('saltflat-analytics', 'rough');
+t('v3: setSentiment stores on the lab',
+  LABS.find(l=>l.slug==='saltflat-analytics').sentiment === 'rough');
+t('v3: sentiment persists without a re-render',
+  JSON.parse(w.localStorage.getItem('confident-onboarding-portal/v2')).labs
+    .find(l => l.slug === 'saltflat-analytics').sentiment === 'rough');
+
+// --- the post-onboarding survey ---
+w.setRole('lab'); STATE.labSlug = 'northgate-analytical'; w.render();
+t('v3: no survey while the checklist is unfinished', !app.innerHTML.includes('Post-onboarding survey'));
+STATE.labSlug = 'cedar-fork-labs'; w.render();
+t('v3: the survey appears once every task is done', app.innerHTML.includes('Post-onboarding survey'));
+
+// --- archiving ---
+w.setRole('am'); STATE.amLab = null; w.setScope('all'); w.render();
+const archTarget = 'prairie-state-testing';
+const inPortfolioBefore = app.innerHTML.includes('Prairie State Testing');
+w.openArchiveLab(archTarget);
+const af = d.getElementById('modal').querySelector('form');
+af.elements.confirm.value = 'wrong name';
+w.submitArchiveLab({preventDefault(){}, target: af}, archTarget);
+t('v3: archiving is refused when the typed name does not match',
+  LABS.find(l=>l.slug===archTarget).archived === false);
+t('v3: the refusal says why', /does not match/.test(d.getElementById('archerr').textContent));
+af.elements.confirm.value = 'Prairie State Testing';
+w.submitArchiveLab({preventDefault(){}, target: af}, archTarget);
+t('v3: the typed name archives the lab', LABS.find(l=>l.slug===archTarget).archived === true);
+w.setScope('all'); w.render();
+t('v3: an archived lab leaves the portfolio table',
+  inPortfolioBefore && !app.innerHTML.includes(`openAmLab('${archTarget}')`));
+t('v3: an archived lab is listed under Archived labs', app.innerHTML.includes('Archived labs'));
+t('v3: its tasks are kept, not destroyed', (TASKS[archTarget]||[]).length > 0);
+w.restoreLab(archTarget);
+t('v3: restore puts it back', LABS.find(l=>l.slug===archTarget).archived === false);
+
+// --- phase templates: add, refuse, move, remove ---
+w.openTemplates();
+const ptId = w.eval('PHASE_TEMPLATES[0].id');
+w.openPhaseTemplate(ptId);
+const phBefore = d.getElementById('modal').querySelectorAll('.phrow').length;
+w.addTemplatePhase(ptId);
+t('v3: addTemplatePhase adds a row',
+  d.getElementById('modal').querySelectorAll('.phrow').length === phBefore + 1);
+t('v3: the new phase is offered to every task picker',
+  [...d.getElementById('modal').querySelectorAll('select[data-tt]')]
+    .every(sel => sel.options.length === phBefore + 1));
+// removing a phase that still holds selected tasks is refused
+const firstPid = d.getElementById('modal').querySelector('.phrow').dataset.pid;
+const rowsBefore = d.getElementById('modal').querySelectorAll('.phrow').length;
+w.removeTemplatePhase(ptId, firstPid);
+t('v3: removing a phase that still holds tasks is refused',
+  d.getElementById('modal').querySelectorAll('.phrow').length === rowsBefore);
+t('v3: the refusal explains what to do',
+  /Move them to another phase first/.test(d.getElementById('pterr').textContent));
+// the empty phase just added can go
+const lastPid = [...d.getElementById('modal').querySelectorAll('.phrow')].pop().dataset.pid;
+w.removeTemplatePhase(ptId, lastPid);
+t('v3: an empty phase can be removed',
+  d.getElementById('modal').querySelectorAll('.phrow').length === rowsBefore - 1);
+
+// moving a task to another phase sticks through a save
+w.openPhaseTemplate(ptId);
+const mf = d.getElementById('modal').querySelector('form');
+const movePids = [...mf.querySelectorAll('.phrow')].map(r => r.dataset.pid);
+const moveSel = mf.querySelector('select[data-tt]');
+const moveTT = moveSel.dataset.tt;
+const moveTo = movePids.find(x => x !== moveSel.value);
+moveSel.value = moveTo;
+w.submitPhaseTemplate({preventDefault(){}, target: mf}, ptId);
+t('v3: a moved task keeps its new phase on the template',
+  w.eval(`PHASE_TEMPLATES.find(p=>p.id==="${ptId}").taskPhase["${moveTT}"]`) === moveTo);
+
+// --- a lab snapshots its template's phases ---
+w.openNewLab();
+const snapF = d.getElementById('modal').querySelector('form');
+snapF.elements.name.value = 'Snapshot Labs';
+snapF.elements.slug.value = 'snapshot-labs';
+snapF.elements.tmpl.value = ptId;
+w.submitNewLab({preventDefault(){}, target: snapF});
+const snapLab = LABS.find(l => l.slug === 'snapshot-labs');
+t('v3: a new lab takes its own copy of the template phases',
+  !!snapLab && snapLab.phases.length === w.eval(`PHASE_TEMPLATES.find(p=>p.id==="${ptId}").phases.length`));
+t('v3: the snapshot is a copy, not a shared reference',
+  snapLab.phases !== w.eval(`PHASE_TEMPLATES.find(p=>p.id==="${ptId}").phases`));
+const snapNameBefore = snapLab.phases[0].name;
+w.eval(`PHASE_TEMPLATES.find(p=>p.id==="${ptId}").phases[0].name = "Renamed after the fact"`);
+t('v3: editing the template later does not reshape the live lab',
+  snapLab.phases[0].name === snapNameBefore);
+t('v3: a task moved in the template lands in that phase on the new lab',
+  (TASKS['snapshot-labs']||[]).length > 0 &&
+  TASKS['snapshot-labs'].every(x => snapLab.phases.some(p => p.id === x.phase)));
+
+// --- the COA example ---
+t('v3: a COA template example task ships in the library',
+  w.eval('TASK_TEMPLATES.some(t => /COA template example/i.test(t.title))'));
+t('v3: it carries the worked example document',
+  w.eval('TASK_TEMPLATES.find(t => /COA template example/i.test(t.title)).docs.includes("coaExample")'));
+
+// --- lab settings exposes the v3 fields ---
+w.openLabSettings('northgate-analytical');
+const v3f = d.getElementById('modal').querySelector('form');
+t('v3: lab settings has a due-date box per phase',
+  LABS.find(l=>l.slug==='northgate-analytical').phases.every(p => v3f.elements['due-'+p.id]));
+t('v3: lab settings exposes industries, status note and Linear',
+  v3f.querySelectorAll('input[name="industry"]').length === w.eval('INDUSTRIES.length') &&
+  !!v3f.elements.statusNote && !!v3f.elements.linearUrl);
+v3f.elements.statusNote.value = 'Smoke status note.';
+v3f.elements.linearUrl.value  = 'https://linear.app/confident/project/smoke';
+v3f.querySelectorAll('input[name="industry"]').forEach(i => { i.checked = false; });
+v3f.querySelectorAll('input[name="industry"]')[0].checked = true;
+v3f.elements['due-'+P0.id].value = '2027-02-02';
+w.submitLabSettings({preventDefault(){}, target: v3f}, 'northgate-analytical');
+t('v3: the status note saves', L0.statusNote === 'Smoke status note.');
+t('v3: the Linear project saves', L0.linearUrl === 'https://linear.app/confident/project/smoke');
+t('v3: the industry tag saves', L0.industries.length === 1);
+t('v3: the phase date override saves', L0.phaseDue[P0.id] === '2027-02-02');
+w.openLabSettings('northgate-analytical');
+const v3f2 = d.getElementById('modal').querySelector('form');
+v3f2.elements['due-'+P0.id].value = '';
+w.submitLabSettings({preventDefault(){}, target: v3f2}, 'northgate-analytical');
+t('v3: clearing a phase date drops the override rather than storing ""',
+  !(P0.id in L0.phaseDue));
+w.closeModal();
+
+// --- every v3 modal's handlers resolve ---
+const v3Missing = [];
+[['archive lab',    () => w.openArchiveLab('northgate-analytical')],
+ ['phase template', () => w.openPhaseTemplate(ptId)],
+ ['lab settings',   () => w.openLabSettings('northgate-analytical')],
+ ['new lab',        () => w.openNewLab()]
+].forEach(([label, open]) => {
+  open();
+  scanHandlers(d.getElementById('modal'))
+    .forEach(h => { if (typeof w[h] !== 'function') v3Missing.push(label + ' → ' + h + '()'); });
+});
+t('v3: all new modal on* handlers defined', v3Missing.length === 0, v3Missing.join(', '));
+w.closeModal();
+
+// --- v3 state survives a reload ---
+w.saveState();
+const dom5 = new JSDOM(html, {
+  runScripts: 'dangerously', pretendToBeVisual: true, url: 'https://portal.local/',
+  beforeParse(win){ win.scrollTo = () => {};
+    win.localStorage.setItem('confident-onboarding-portal/v2',
+      w.localStorage.getItem('confident-onboarding-portal/v2')); }
+});
+t('v3: lab phases survive a reload',
+  (dom5.window.eval('LABS').find(l => l.slug === 'snapshot-labs') || {}).phases.length > 0);
+t('v3: the status note survives a reload',
+  dom5.window.eval('LABS').find(l => l.slug === 'northgate-analytical').statusNote === 'Smoke status note.');
+t('v3: template phases survive a reload',
+  dom5.window.eval(`PHASE_TEMPLATES.find(p=>p.id==="${ptId}").phases.length`) > 0);
+t('v3: no reloaded task carries a dueDate',
+  dom5.window.eval('Object.values(TASKS).every(a => a.every(x => x.dueDate === undefined))'));
 
 console.log('\n  PASS (' + ok.length + ')');
 ok.forEach(x => console.log('   ok   ' + x));
